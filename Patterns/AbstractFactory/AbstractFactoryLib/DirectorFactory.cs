@@ -4,7 +4,7 @@ namespace Patterns
 	/// <summary>
 	/// Фабрика директора.
 	/// </summary>
-	public class DirectorFactory : INorbitWorkerFactory 
+	public class DirectorFactory : IWorkerFactory 
 	{
 		#region Методы.
 		/// <summary>

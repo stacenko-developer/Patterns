@@ -19,8 +19,8 @@ namespace Patterns
 		/// </summary>
 		private static void RunDemo()
 		{
-			var programmer = new NorbitWorker(new ProgrammerFactory());
-			var director = new NorbitWorker(new DirectorFactory());
+			var programmer = new Worker(new ProgrammerFactory());
+			var director = new Worker(new DirectorFactory());
 
 			Console.WriteLine($"Реализация паттерна Абстрактная фабрика: {Environment.NewLine}" +
 				$"Программист: {Environment.NewLine}{programmer} {Environment.NewLine}Директор: " +

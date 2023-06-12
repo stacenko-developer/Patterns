@@ -2,9 +2,9 @@
 namespace Patterns
 {
 	/// <summary>
-	/// Фабрика сотрудника Норбит.
+	/// Фабрика сотрудника.
 	/// </summary>
-	public interface INorbitWorkerFactory 
+	public interface IWorkerFactory 
 	{
 		#region Методы.
 		/// <summary>

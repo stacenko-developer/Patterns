@@ -4,7 +4,7 @@ namespace Patterns
 	/// <summary>
 	/// Фабрика программиста.
 	/// </summary>
-	public class ProgrammerFactory : INorbitWorkerFactory
+	public class ProgrammerFactory : IWorkerFactory
 	{
 		#region Методы.
 		/// <summary>

@@ -48,10 +48,10 @@
     <Compile Include="BMW.cs" />
     <Compile Include="Computer.cs" />
     <Compile Include="DirectorFactory.cs" />
-    <Compile Include="INorbitWorkerFactory.cs" />
+    <Compile Include="IWorkerFactory.cs" />
     <Compile Include="Lada.cs" />
     <Compile Include="Laptop.cs" />
-    <Compile Include="NorbitWorker.cs" />
+    <Compile Include="Worker.cs" />
     <Compile Include="ProgrammerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkingCar.cs" />

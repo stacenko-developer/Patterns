@@ -3,9 +3,9 @@
 namespace Patterns
 {
 	/// <summary>
-	/// Сотрудник Норбит.
+	/// Сотрудник.
 	/// </summary>
-	public class NorbitWorker
+	public class Worker
 	{
 		#region Поля.
 		/// <summary>
@@ -21,20 +21,20 @@ namespace Patterns
 
 		#region Конструкторы.
 		/// <summary>
-		/// Создание сотрудника Норбит с помощью указанных параметров.
+		/// Создание сотрудника с помощью указанных параметров.
 		/// </summary>
-		/// <param name="norbitWorkerFactory">Фабрика сотрудника Норбит.</param>
-		/// <exception cref="ArgumentNullException">Фабрика сотрудника Норбит равна null!</exception>
-		public NorbitWorker(INorbitWorkerFactory norbitWorkerFactory)
+		/// <param name="workerFactory">Фабрика сотрудника.</param>
+		/// <exception cref="ArgumentNullException">Фабрика сотрудника равна null!</exception>
+		public Worker(IWorkerFactory workerFactory)
 		{
-			if (norbitWorkerFactory == null)
+			if (workerFactory == null)
 			{
-				throw new ArgumentNullException(nameof(norbitWorkerFactory),
-					"Фабрика для создания сотрудника Норбит равна null!");
+				throw new ArgumentNullException(nameof(workerFactory),
+					"Фабрика для создания сотрудника равна null!");
 			}
 
-			_workingCar = norbitWorkerFactory.CreateWorkingCar();
-			_workingDevice = norbitWorkerFactory.CreateWorkingDevice();
+			_workingCar = workerFactory.CreateWorkingCar();
+			_workingDevice = workerFactory.CreateWorkingDevice();
 		}
 		#endregion
 
@@ -53,7 +53,7 @@ namespace Patterns
 
 		#region Переопределенные методы.
 		/// <summary>
-		/// Строковое представления объекта сотрудника Норбит. 
+		/// Строковое представления объекта сотрудника. 
 		/// </summary>
 		/// <returns>Данные сотрудника Норбит в виде строки.</returns>
 		public override string ToString() => $"Стоимость налога на рабочий автомобиль {GetTax()}" +

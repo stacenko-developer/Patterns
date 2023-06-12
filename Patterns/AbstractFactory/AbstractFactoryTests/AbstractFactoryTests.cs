@@ -18,7 +18,7 @@ namespace Patterns
 		[TestMethod]
 		public void CreateWorker_WithNullWorkerFactory_ShouldThrowArgumentNullException()
 		{
-			new NorbitWorker(null);
+			new Worker(null);
 		}
 
 		/// <summary>
@@ -27,7 +27,7 @@ namespace Patterns
 		[TestMethod]
 		public void CreateWorker_WithCorrectArguments_ShouldCreateWorker()
 		{
-			new NorbitWorker(new ProgrammerFactory());
+			new Worker(new ProgrammerFactory());
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Patterns
 		[TestMethod]
 		public void CreateProgrammer_WithCorrectArguments_ShouldGetCorrectResults()
 		{
-			var programmer = new NorbitWorker(new ProgrammerFactory());
+			var programmer = new Worker(new ProgrammerFactory());
 			var correctTax = 1000;
 			var correctAccessoriesCost = 5000;
 
@@ -50,7 +50,7 @@ namespace Patterns
 		[TestMethod]
 		public void CreateDirector_WithCorrectArguments_ShouldGetCorrectResults()
 		{
-			var director = new NorbitWorker(new DirectorFactory());
+			var director = new Worker(new DirectorFactory());
 			var correctTax = 5000;
 			var correctAccessoriesCost = 6000;
 
@@ -64,8 +64,8 @@ namespace Patterns
 		[TestMethod]
 		public void AnalyzeAbstractFactoryPatternStructure_ShouldGetCorrectStructure()
 		{
-			Assert.IsTrue(typeof(ProgrammerFactory).GetInterfaces().Contains(typeof(INorbitWorkerFactory))
-				&& typeof(DirectorFactory).GetInterfaces().Contains(typeof(INorbitWorkerFactory))
+			Assert.IsTrue(typeof(ProgrammerFactory).GetInterfaces().Contains(typeof(IWorkerFactory))
+				&& typeof(DirectorFactory).GetInterfaces().Contains(typeof(IWorkerFactory))
 				&& typeof(Lada).BaseType == typeof(WorkingCar) && typeof(BMW).BaseType == typeof(WorkingCar)
 				&& typeof(Computer).BaseType == typeof(WorkingDevice) 
 				&& typeof(Laptop).BaseType == typeof(WorkingDevice));
