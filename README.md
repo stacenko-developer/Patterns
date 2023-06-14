@@ -12,7 +12,7 @@
 
 1. [Порождающие (Creational)](#Порождающие (Creational))
     1. [Абстрактная фабрика (Abstract Factory)](#Абстрактная-фабрика)
-    2. [Одиночка (Singleton)](#Singleton)
+    2. [Одиночка (Singleton)](#Одиночка (Singleton))
 2. [Структурные (Structural)](#Структурные-(Structural))
     1. [Адаптер (Adapter)](#Адаптер-(Adapter))
     2. [Декоратор (Decorator)](#Декоратор-(Decorator))
