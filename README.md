@@ -271,3 +271,81 @@ ___
 ### Адаптер
 Адаптер (Adapter) - это структурный шаблон проектирования, который используется для организации использования методов объекта, недоступного для модификации, через специально созданный интерфейс.<br>
 > __Проблема__: у нас уже есть конкретный класс и нужно, чтобы этот класс реализовывал определенный интерфейс, при этом сам класс менять нельзя.
+
+:white_check_mark: Решение: мы пишем класс, который будет реализовывать необходимый интерфейс, затем мы наследуем наш класс от того класса, который нам нужно изменить без прямого вмешательства в тот класс.
+Предположим, что у нас есть офис, в котором работают сотрудники. У офиса есть название, адрес:
+```C#
+/// <summary>
+/// Офис.
+/// </summary>
+public class Office
+{
+        /// <summary>
+        /// Название.
+        /// </summary>
+        protected string _name; 
+
+        /// <summary>
+        /// Адрес.
+        /// </summary>
+        protected string _address;
+
+        /// <summary>
+        /// Создает офис с помощью указанных параметров.
+        /// </summary>
+        /// <param name="name">Название офиса.</param>
+        /// <param name="address">Адрес офиса.</param>
+        public Office(string name, string address)
+        {
+            Validator.ValidateStringText(name);
+            Validator.ValidateStringText(address);
+
+            _name = name;
+            _address = address;
+        }
+}
+```
+Теперь нам необходимо добавить метод "переезда офиса". То есть метод, который устанавливает новое значение для адреса. Не будем забывать, что существующий класс нельзя модифицировать. Решим проблему с помощью паттерна Адаптер:<br>
+:one: Создадим интерфейс IMovable, в котором будет один метод Move, принимающий новый адрес офиса.
+```C#
+/// <summary>
+/// Содержит методы, связанные с переездом офиса.
+/// </summary>
+public interface IMovable
+{
+	/// <summary>
+	/// Изменение адреса офиса.
+	/// </summary>
+	/// <param name="newAddress">Новый адрес.</param>  
+	void Move(string newAddress);
+}
+```
+:two: Создадим класс-наследник нашего базового класса Office, пусть это будет офис какой-то конкретной компании (например, Норбит). В данном классе мы реализуем интерфейс __IMovable__.
+```C#
+/// <summary>
+/// Офис Норбит. Реализация паттерна Адаптер.
+/// </summary>
+public class NrbOffice : Office, IMovable
+{
+	/// <summary>
+	/// Создает офис Норбит с помощью указанных параметров. 
+	/// </summary>
+	/// <param name="name">Название офиса.</param>
+	/// <param name="address">Адрес офиса.</param>
+	public NrbOffice(string name, string address)
+		: base(name, address)
+	{
+	}
+
+	/// <summary>
+	/// Изменение адреса офиса.
+	/// </summary>
+	/// <param name="newAddress">Новый адрес.</param>
+	public void Move(string newAddress)
+	{
+		Validator.ValidateStringText(newAddress);
+
+		_address = newAddress;
+	}
+}
+```
