@@ -446,4 +446,35 @@ public class AdditionalFilteringCondition : NorbitWorkersFilter
 ```
 > Перед тем, как список будет отфильтрован дополнительным условием, он сначала будет отфильтрован фильтров базового метода с помощью __base.GetFiltratedList()__
 
-:four:
+:four: Добавим классы, которые будут фильтровать сотрудников по возрасту и должности. 
+```C#
+/// <summary>
+/// Фильтр сотрудников по возрасту.
+/// </summary>
+public class AgeWorkersFilter : AdditionalFilteringCondition
+{
+	/// <summary>
+	/// Минимальное допустимое значение возраста.  
+	/// </summary>
+	private int _defaultMinCorrectAge = 25; 
+
+	/// <summary>
+	/// Создание фильтра сотрудников по возрасту с помощью указанных параметров.
+	/// </summary>
+	/// <param name="filter">Базовый фильтр сотрудников Норбит.</param>
+	public AgeWorkersFilter(NorbitWorkersFilter filter)
+		: base(filter)
+	{
+		Workers = filter.GetFiltratedList();
+	}
+
+	/// <summary>
+	/// Получение отфильтрованного списка сотрудников.
+	/// </summary>
+	/// <returns>Отфильтрованный список сотрудников.</returns>
+	public override List<Worker> GetFiltratedList() => Workers
+		.Where(worker => worker.Age >= _defaultMinCorrectAge)
+		.ToList();
+}
+```
+> По такому же принципу реализован класс PostWorkersFilter. Для подробного ознакомления рекомендую перейти в репозиторий. Также с помощью консольного приложения вы можете наблюдать снижения количества сотрудников в коллекции по мере добавления к базовому фильтру сотрудников дополнительный оберток.
