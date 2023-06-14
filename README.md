@@ -358,3 +358,93 @@ ___
 __Декоратор (Decorator)__ - это паттерн, который позволяет динамически подключать к объекту дополнительную функциональность, оборачивая объект в обертки. <br>
 Для того, чтобы определить какой-либо новый функционал, как правило, мы прибегаем к наследованию. Декораторы в отличие от наследования позволяют динамически в процессе выполнения определять новые возможности у объектов.<br>
 > Можно использовать несколько разных обёрток одновременно и вы получите бъединённое поведение сразу всех обёрток.
+
+Давайте теперь реализуем данный паттерн. Пусть у нас также будут сотрудники какой-то компании. У нас есть __задача__: отфильтровать сотрудника по определенному признаку.<br>
+:one: Для начала создадим абстрактный класс __WorkersFilter__, в котором будет метод __GetFiltratedList()__, который будет возвращать нам отфильтрованный список сотрудников.
+```C#
+/// <summary>
+/// Фильтр.
+/// </summary>
+public abstract class WorkersFilter
+{
+        /// <summary>
+        /// Получение отфильтрованного списка.
+        /// </summary>
+        /// <returns>Отфильтрованный список.</returns>  
+        public abstract List<Worker> GetFiltratedList(); 
+}
+```
+:two: Создаем класс-наследник NorbitWorkersFilter, базовый класс у которого WorkersFilter. В наследнике мы реализуем логику метода GetFiltratedList(). То есть текущий фильтр будет возвращать коллекцию, у всех сотрудников которой значение свойства __Organization__ равно __Norbit__.
+```C#
+/// <summary>
+/// Фильтр сотрудников.
+/// </summary>
+public class NorbitWorkersFilter : WorkersFilter
+{
+	/// <summary>
+	/// Сотрудники.
+	/// </summary>
+	protected static List<Worker> Workers; 
+
+	/// <summary>
+	/// Название организации по умолчанию.
+	/// </summary>
+	private string _defaultOrganization = "Норбит";
+
+	/// <summary>
+	/// Создание фильтра сотрудников с помощью указанных параметров.
+	/// </summary>
+	/// <param name="workers">Список сотрудников.</param>
+	/// <exception cref="ArgumentNullException">Список сотрудников или его элементы равны null!</exception>
+	public NorbitWorkersFilter(List<Worker> workers)
+	{
+		if (workers == null || workers.FindIndex(worker => worker == null) != -1)
+		{
+			throw new ArgumentNullException(nameof(workers), "Список сотрудников или его элементы равны null!");
+		}
+
+		Workers = workers;
+	}
+
+	/// <summary>
+	/// Получение отфильтрованного списка сотрудников.
+	/// </summary>
+	/// <returns>Отфильтрованный список сотрудников.</returns>
+	public override List<Worker> GetFiltratedList() => Workers
+		.Where(worker => worker.Organization == _defaultOrganization)
+		.ToList();
+}
+```
+:three: Создаем класс дополнительного условия фильтрации, который будет классом-наследником класс NorbitWorkersFilter. Он будет создаваться с помощью конструктора, который будет приниматт объект типа NorbitWorkersFilter. 
+```C#
+/// <summary>
+/// Дополнительное условие фильтрации.
+/// </summary>
+public class AdditionalFilteringCondition : NorbitWorkersFilter
+{
+	/// <summary>
+	/// Фильтр сотрудников Норбит.
+	/// </summary>
+	protected NorbitWorkersFilter _filter; 
+
+	/// <summary>
+	/// Создает дополнительное условие фильтрации с помощью указанных параметров.
+	/// </summary>
+	/// <param name="filter">Фильтр сотрудников Норбит.</param>
+	public AdditionalFilteringCondition(NorbitWorkersFilter filter)
+		: base(Workers)
+	{
+		if (filter == null)
+		{
+			throw new ArgumentNullException(nameof(filter), "Фильтр равен null!");
+		}
+
+		_filter = filter;
+		Workers = base.GetFiltratedList();
+	}
+	#endregion
+}
+```
+> Перед тем, как список будет отфильтрован дополнительным условием, он сначала будет отфильтрован фильтров базового метода с помощью __base.GetFiltratedList()__
+
+:four:
