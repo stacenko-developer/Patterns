@@ -442,7 +442,6 @@ public class AdditionalFilteringCondition : NorbitWorkersFilter
 		_filter = filter;
 		Workers = base.GetFiltratedList();
 	}
-	#endregion
 }
 ```
 > Перед тем, как список будет отфильтрован дополнительным условием, он сначала будет отфильтрован фильтров базового метода с помощью __base.GetFiltratedList()__
