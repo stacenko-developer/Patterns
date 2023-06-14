@@ -11,7 +11,7 @@ namespace Patterns
     {
         #region Поля.
         /// <summary>
-        /// Название офиса.
+        /// Название.
         /// </summary>
         protected string _name; 
 
