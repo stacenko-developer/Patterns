@@ -486,3 +486,197 @@ ___
 __Поведенческие паттерны__ (Behavioral) описывают способы реализации взаимодействия между объектами с отличающимися типами. При таком взаимодействии объекты могут решать более трудные задачи, чем если бы они решали их по-отдельности.
 ___
 ### Итератор
+__Итератор (Iterator)__ - это поведенческий паттерн проектирования, благодаря которому у нас есть возможность последовательно обходить элементы составных объектов, при этом не раскрывая их внутреннего представления.<br>
+Идея паттерна в том, чтобы вынести поведение обхода коллекции из самой коллекции в __отдельный класс__. <br>
+> :white_check_mark: Зная эту информацию, давайте теперь его реализуем.
+
+Пусть у нас будет файловая система, которая будет хранить файлы. У каждого файла есть следующие свойства:
+```C#
+/// <summary>
+/// Файл.
+/// </summary>
+public class File
+{
+	/// <summary>
+	/// Идентификатор.
+	/// </summary>
+	public Guid Id { get; set; }
+
+	/// <summary>
+	/// Название.
+	/// </summary>
+	public string Name { get; set; }
+
+	/// <summary>
+	/// Тип.
+	/// </summary>
+	public string Type { get; set; }
+
+	/// <summary>
+	/// Строковое преставление объекта файла.
+	/// </summary>
+	/// <returns>Данные объекта файла в виде строки.</returns>
+	public override string ToString() => $"Идентификатор: {Id} Название: {Name} Тип: {Type}";
+}
+```
+:one: Создадим интерфейс IFileIterator итератора для файловой системы:
+```C#
+/// <summary>
+/// Содержит методы для итератора файловой системы.
+/// </summary>
+public interface IFileIterator
+{
+	/// <summary>
+	/// Проверяет, есть ли в коллекции следующий элемент.
+	/// </summary>
+	/// <returns>Результат проверки.</returns>
+	bool HasNext();
+
+	/// <summary>
+	/// Получает следующий элемент.
+	/// </summary>
+	/// <returns>Следующий элемент.</returns>
+	File Next();
+}
+```
+:two: Создадим интерфейс IFileNumerator, содержащий методы получения итератора из коллекции: 
+```C#
+/// <summary>
+/// Содержит методы получения итератора из коллекции.
+/// </summary>
+public interface IFileNumerable
+{
+	/// <summary>
+	/// Создание итератора.
+	/// </summary>
+	/// <returns>Созданный итератор.</returns>
+	IFileIterator CreateNumerator(); 
+
+	/// <summary>
+	/// Количество элементов в коллекции.
+	/// </summary>
+	int Count { get; }
+
+	/// <summary>
+	/// Получение элемента из коллекции по индексу.
+	/// </summary>
+	/// <param name="index">Индекс элемента, который необходимо получить.</param>
+	/// <returns>Элемент по индексу.</returns>
+	File this[int index] { get; }
+}
+```
+:three: Теперь мы можем создать конкретную файловую систему, реализующую интерфейс IFileNumerable:
+```C#
+/// <summary>
+/// Файловая система.
+/// </summary>
+public class FileSystem : IFileNumerable
+{
+	/// <summary>
+	/// Файлы, хранящиеся в файловой системе.
+	/// </summary>
+	private List<File> _files;
+
+	/// <summary>
+	/// Количество файлов в файловой системе.
+	/// </summary>
+	public int Count => _files.Count;
+
+	/// <summary>
+	/// Создание файловой системы.
+	/// </summary>
+	public FileSystem()
+	{
+		_files = new List<File>();
+	}
+ 
+	/// <summary>
+	/// Проверяет выход индекса за границы списка файлов файловой системы.
+	/// </summary>
+	/// <param name="index">Порядковый номер элемента.</param>
+	/// <exception cref="ArgumentOutOfRangeException">Индекс вышел за границы!
+	/// </exception>
+	private void ValidateIndex(int index)
+	{
+		if (index < 0 || index >= _files.Count)
+		{
+			throw new ArgumentOutOfRangeException("Индекс вышел за границы массива!");
+		}
+	}
+
+	/// <summary>
+	/// Создание итератора.
+	/// </summary>
+	/// <returns>Итератор.</returns>
+	public IFileIterator CreateNumerator() => new FileSystemNumerator(this); // Данный класс мы создадим далее.
+
+	/// <summary>
+	/// Доступ к элементам файловой системы.
+	/// </summary>
+	/// <param name="index">Позиция элемента, к которому необходим доступ.</param>
+	/// <exception cref="ArgumentOutOfRangeException">Индекс вышел за границы!</exception>
+	public File this[int index]
+	{
+		get
+		{
+			ValidateIndex(index);
+			return _files[index];
+		}
+	}
+}
+```
+:four: Теперь последний шаг - реализуем класс-алгоритм обхода файловой системы, реализующий интерфейс IFileIterator.
+```C#
+/// <summary>
+/// Реализует алгоритм обхода файловой системы.
+/// </summary>
+public class FileSystemNumerator : IFileIterator
+{
+	/// <summary>
+	/// Содержит методы для создания объекта-итератора.
+	/// </summary>
+	private IFileNumerable _aggregate;
+
+	/// <summary>
+	/// Индекс текущего элемента.
+	/// </summary>
+	private int _index = 0;
+
+	/// <summary>
+	/// Создание итератора файловой системы с помощью указанных параметров.
+	/// </summary>
+	/// <param name="aggregate">Содержит методы для создания объекта-итератора.</param>
+	/// <exception cref="ArgumentNullException">Интерфейс для создания объекта-итератора равен null!</exception>
+	public FileSystemNumerator(IFileNumerable aggregate)
+	{
+		if (aggregate == null)
+		{
+			throw new ArgumentNullException(nameof(aggregate), 
+				"Интерфейс для создания объекта-итератора равен null!");
+		}
+
+		_aggregate = aggregate;
+	}
+
+	/// <summary>
+	/// Проверяет наличие следующего элемента.
+	/// </summary>
+	/// <returns>Результат проверки.</returns>
+	public bool HasNext() => _index < _aggregate.Count;
+
+	/// <summary>
+	/// Получение следующего элемента из файловой системы.
+	/// </summary>
+	/// <returns>Следующий файл.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">Индекс вышел за границы!</exception>
+	public File Next()
+	{
+		if (!HasNext())
+		{
+			throw new ArgumentOutOfRangeException("Индекс вышел за границы!");
+		}
+
+		return _aggregate[_index++];
+	}
+}
+```
