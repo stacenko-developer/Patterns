@@ -799,3 +799,63 @@ public class User : IObserver<Message>
 			$"Логин получателя: {_login}");
 	}
 ```
+:three: Теперь создадим класс нашего корпоративного портала, реализующий интерфейс IObservable (наблюдаемый объект). В качестве параметра также выступает тип данных Message - тип сообщения для подписчиков.
+```C#
+/// <summary>
+/// Корпоративный портал.
+/// </summary>
+public class CorporatePortal : IObservable<Message>
+{
+	/// <summary>
+	/// Список подписчиков.
+	/// </summary>
+	private readonly List<IObserver<Message>> _observers; 
+
+	/// <summary>
+	/// Создание корпоративного портала.
+	/// </summary>
+	public CorporatePortal()
+	{
+		_observers = new List<IObserver<Message>>();
+	}
+
+	/// <summary>
+	/// Подписка на уведомления.
+	/// </summary>
+	/// <param name="observer">Подписчик.</param>
+	/// <returns>Объект с механизмом освобождения неуправляемых ресурсов.</returns>
+	/// <exception cref="ArgumentNullException">Подписчик равен null!</exception>
+	public IDisposable Subscribe(IObserver<Message> observer)
+	{
+		if (observer == null)
+		{
+			throw new ArgumentNullException(nameof(observer), "Подписчик равен null!");
+		}
+
+		_observers.Add(observer);
+
+		return new Unsubscriber<Message>(_observers, observer); // Данные класс будет реализован далее.
+	}
+
+	/// <summary>
+	/// Отправляет уведомление всем подписчикам.
+	/// </summary>
+	/// <param name="message">Сообщение, которое будет отправлено всем подписчикам.</param>
+	/// <exception cref="ArgumentNullException">Сообщение равно null!</exception>
+	public void Notify(Message message)
+	{
+		if (message == null)
+		{
+			throw new ArgumentNullException(nameof(message), "Сообщение равно null!");
+		}
+
+		foreach (var observer in _observers)
+		{
+			observer.OnNext(message);
+		}
+	}
+}
+```
+> Несколько комментариев касательно Unsubscriber: нам необходимо, чтобы помимо подписки на событие, у пользователя была возможность и отписаться от события. В Unsubscriber должен храниться список всех подписчиков и конкретный подписчик, с которым будет происходить взаимодействие.
+
+:four: Теперь давайте реализуем данный класс. Обратите внимание, что он должен реализовывать интерфейс __IDisposable__, в котором содержится метод Dispose - именно так будет происходить отписка пользователя от уведомлений корпоративного портала.
