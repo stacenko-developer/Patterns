@@ -353,3 +353,572 @@ public class NrbOffice : Office, IMovable
 ```
 :white_check_mark: __Преимущества паттерна Adapter__: возможность отделения интерфейса или кода преобразования данных от основной бизнес-логики программы.<br>
 :x: __Недостатки__: общая сложность кода увеличивается. 
+___
+### Декоратор
+__Декоратор (Decorator)__ - это паттерн, который позволяет динамически подключать к объекту дополнительную функциональность, оборачивая объект в обертки. <br>
+Для того, чтобы определить какой-либо новый функционал, как правило, мы прибегаем к наследованию. Декораторы в отличие от наследования позволяют динамически в процессе выполнения определять новые возможности у объектов.<br>
+> Можно использовать несколько разных обёрток одновременно и вы получите бъединённое поведение сразу всех обёрток.
+
+Давайте теперь реализуем данный паттерн. Пусть у нас также будут сотрудники какой-то компании. У нас есть __задача__: отфильтровать сотрудника по определенному признаку.<br>
+:one: Для начала создадим абстрактный класс __WorkersFilter__, в котором будет метод __GetFiltratedList()__, который будет возвращать нам отфильтрованный список сотрудников.
+```C#
+/// <summary>
+/// Фильтр.
+/// </summary>
+public abstract class WorkersFilter
+{
+        /// <summary>
+        /// Получение отфильтрованного списка.
+        /// </summary>
+        /// <returns>Отфильтрованный список.</returns>  
+        public abstract List<Worker> GetFiltratedList(); 
+}
+```
+:two: Создаем класс-наследник NorbitWorkersFilter, базовый класс у которого WorkersFilter. В наследнике мы реализуем логику метода GetFiltratedList(). То есть текущий фильтр будет возвращать коллекцию, у всех сотрудников которой значение свойства __Organization__ равно __Norbit__.
+```C#
+/// <summary>
+/// Фильтр сотрудников.
+/// </summary>
+public class NorbitWorkersFilter : WorkersFilter
+{
+	/// <summary>
+	/// Сотрудники.
+	/// </summary>
+	protected static List<Worker> Workers; 
+
+	/// <summary>
+	/// Название организации по умолчанию.
+	/// </summary>
+	private string _defaultOrganization = "Норбит";
+
+	/// <summary>
+	/// Создание фильтра сотрудников с помощью указанных параметров.
+	/// </summary>
+	/// <param name="workers">Список сотрудников.</param>
+	/// <exception cref="ArgumentNullException">Список сотрудников или его элементы равны null!</exception>
+	public NorbitWorkersFilter(List<Worker> workers)
+	{
+		if (workers == null || workers.FindIndex(worker => worker == null) != -1)
+		{
+			throw new ArgumentNullException(nameof(workers), "Список сотрудников или его элементы равны null!");
+		}
+
+		Workers = workers;
+	}
+
+	/// <summary>
+	/// Получение отфильтрованного списка сотрудников.
+	/// </summary>
+	/// <returns>Отфильтрованный список сотрудников.</returns>
+	public override List<Worker> GetFiltratedList() => Workers
+		.Where(worker => worker.Organization == _defaultOrganization)
+		.ToList();
+}
+```
+:three: Создаем класс дополнительного условия фильтрации, который будет классом-наследником класс NorbitWorkersFilter. Он будет создаваться с помощью конструктора, который будет приниматт объект типа NorbitWorkersFilter. 
+```C#
+/// <summary>
+/// Дополнительное условие фильтрации.
+/// </summary>
+public class AdditionalFilteringCondition : NorbitWorkersFilter
+{
+	/// <summary>
+	/// Фильтр сотрудников Норбит.
+	/// </summary>
+	protected NorbitWorkersFilter _filter; 
+
+	/// <summary>
+	/// Создает дополнительное условие фильтрации с помощью указанных параметров.
+	/// </summary>
+	/// <param name="filter">Фильтр сотрудников Норбит.</param>
+	public AdditionalFilteringCondition(NorbitWorkersFilter filter)
+		: base(Workers)
+	{
+		if (filter == null)
+		{
+			throw new ArgumentNullException(nameof(filter), "Фильтр равен null!");
+		}
+
+		_filter = filter;
+		Workers = base.GetFiltratedList();
+	}
+}
+```
+> Перед тем, как список будет отфильтрован дополнительным условием, он сначала будет отфильтрован фильтров базового метода с помощью __base.GetFiltratedList()__
+
+:four: Добавим классы, которые будут фильтровать сотрудников по возрасту и должности. 
+```C#
+/// <summary>
+/// Фильтр сотрудников по возрасту.
+/// </summary>
+public class AgeWorkersFilter : AdditionalFilteringCondition
+{
+	/// <summary>
+	/// Минимальное допустимое значение возраста.  
+	/// </summary>
+	private int _defaultMinCorrectAge = 25; 
+
+	/// <summary>
+	/// Создание фильтра сотрудников по возрасту с помощью указанных параметров.
+	/// </summary>
+	/// <param name="filter">Базовый фильтр сотрудников Норбит.</param>
+	public AgeWorkersFilter(NorbitWorkersFilter filter)
+		: base(filter)
+	{
+		Workers = filter.GetFiltratedList();
+	}
+
+	/// <summary>
+	/// Получение отфильтрованного списка сотрудников.
+	/// </summary>
+	/// <returns>Отфильтрованный список сотрудников.</returns>
+	public override List<Worker> GetFiltratedList() => Workers
+		.Where(worker => worker.Age >= _defaultMinCorrectAge)
+		.ToList();
+}
+```
+> По такому же принципу реализован класс PostWorkersFilter. Для подробного ознакомления рекомендую перейти в репозиторий. Также с помощью консольного приложения вы можете наблюдать снижения количества сотрудников в коллекции по мере добавления к базовому фильтру сотрудников дополнительный оберток.
+
+:white_check_mark: __Преимущества паттерна Decorator__: возможность добавлять или удалять функционал из экземпляра класса во время выполнения, благодаря оберткам объединить несколько возможных вариантов поведения объекта.<br>
+:x: __Недостатки__: в результате получается большое число мелких объектов, которые друг на друга похожи и отличаются способом взаимосвязи.
+___
+## Поведенческие паттерны
+__Поведенческие паттерны__ (Behavioral) описывают способы реализации взаимодействия между объектами с отличающимися типами. При таком взаимодействии объекты могут решать более трудные задачи, чем если бы они решали их по-отдельности.
+___
+### Итератор
+__Итератор (Iterator)__ - это поведенческий паттерн проектирования, благодаря которому у нас есть возможность последовательно обходить элементы составных объектов, при этом не раскрывая их внутреннего представления.<br>
+Идея паттерна в том, чтобы вынести поведение обхода коллекции из самой коллекции в __отдельный класс__. <br>
+> :white_check_mark: Зная эту информацию, давайте теперь его реализуем.
+
+Пусть у нас будет файловая система, которая будет хранить файлы. У каждого файла есть следующие свойства:
+```C#
+/// <summary>
+/// Файл.
+/// </summary>
+public class File
+{
+	/// <summary>
+	/// Идентификатор.
+	/// </summary>
+	public Guid Id { get; set; }
+
+	/// <summary>
+	/// Название.
+	/// </summary>
+	public string Name { get; set; }
+
+	/// <summary>
+	/// Тип.
+	/// </summary>
+	public string Type { get; set; }
+
+	/// <summary>
+	/// Строковое преставление объекта файла.
+	/// </summary>
+	/// <returns>Данные объекта файла в виде строки.</returns>
+	public override string ToString() => $"Идентификатор: {Id} Название: {Name} Тип: {Type}";
+}
+```
+:one: Создадим интерфейс IFileIterator итератора для файловой системы:
+```C#
+/// <summary>
+/// Содержит методы для итератора файловой системы.
+/// </summary>
+public interface IFileIterator
+{
+	/// <summary>
+	/// Проверяет, есть ли в коллекции следующий элемент.
+	/// </summary>
+	/// <returns>Результат проверки.</returns>
+	bool HasNext();
+
+	/// <summary>
+	/// Получает следующий элемент.
+	/// </summary>
+	/// <returns>Следующий элемент.</returns>
+	File Next();
+}
+```
+:two: Создадим интерфейс IFileNumerator, содержащий методы получения итератора из коллекции: 
+```C#
+/// <summary>
+/// Содержит методы получения итератора из коллекции.
+/// </summary>
+public interface IFileNumerable
+{
+	/// <summary>
+	/// Создание итератора.
+	/// </summary>
+	/// <returns>Созданный итератор.</returns>
+	IFileIterator CreateNumerator(); 
+
+	/// <summary>
+	/// Количество элементов в коллекции.
+	/// </summary>
+	int Count { get; }
+
+	/// <summary>
+	/// Получение элемента из коллекции по индексу.
+	/// </summary>
+	/// <param name="index">Индекс элемента, который необходимо получить.</param>
+	/// <returns>Элемент по индексу.</returns>
+	File this[int index] { get; }
+}
+```
+:three: Теперь мы можем создать конкретную файловую систему, реализующую интерфейс IFileNumerable:
+```C#
+/// <summary>
+/// Файловая система.
+/// </summary>
+public class FileSystem : IFileNumerable
+{
+	/// <summary>
+	/// Файлы, хранящиеся в файловой системе.
+	/// </summary>
+	private List<File> _files;
+
+	/// <summary>
+	/// Количество файлов в файловой системе.
+	/// </summary>
+	public int Count => _files.Count;
+
+	/// <summary>
+	/// Создание файловой системы.
+	/// </summary>
+	public FileSystem()
+	{
+		_files = new List<File>();
+	}
+ 
+	/// <summary>
+	/// Проверяет выход индекса за границы списка файлов файловой системы.
+	/// </summary>
+	/// <param name="index">Порядковый номер элемента.</param>
+	/// <exception cref="ArgumentOutOfRangeException">Индекс вышел за границы!
+	/// </exception>
+	private void ValidateIndex(int index)
+	{
+		if (index < 0 || index >= _files.Count)
+		{
+			throw new ArgumentOutOfRangeException("Индекс вышел за границы массива!");
+		}
+	}
+
+	/// <summary>
+	/// Создание итератора.
+	/// </summary>
+	/// <returns>Итератор.</returns>
+	public IFileIterator CreateNumerator() => new FileSystemNumerator(this); // Данный класс мы создадим далее.
+
+	/// <summary>
+	/// Доступ к элементам файловой системы.
+	/// </summary>
+	/// <param name="index">Позиция элемента, к которому необходим доступ.</param>
+	/// <exception cref="ArgumentOutOfRangeException">Индекс вышел за границы!</exception>
+	public File this[int index]
+	{
+		get
+		{
+			ValidateIndex(index);
+			return _files[index];
+		}
+	}
+}
+```
+:four: Теперь последний шаг - реализуем класс-алгоритм обхода файловой системы, реализующий интерфейс IFileIterator.
+```C#
+/// <summary>
+/// Реализует алгоритм обхода файловой системы.
+/// </summary>
+public class FileSystemNumerator : IFileIterator
+{
+	/// <summary>
+	/// Содержит методы для создания объекта-итератора.
+	/// </summary>
+	private IFileNumerable _aggregate;
+
+	/// <summary>
+	/// Индекс текущего элемента.
+	/// </summary>
+	private int _index = 0;
+
+	/// <summary>
+	/// Создание итератора файловой системы с помощью указанных параметров.
+	/// </summary>
+	/// <param name="aggregate">Содержит методы для создания объекта-итератора.</param>
+	/// <exception cref="ArgumentNullException">Интерфейс для создания объекта-итератора равен null!</exception>
+	public FileSystemNumerator(IFileNumerable aggregate)
+	{
+		if (aggregate == null)
+		{
+			throw new ArgumentNullException(nameof(aggregate), 
+				"Интерфейс для создания объекта-итератора равен null!");
+		}
+
+		_aggregate = aggregate;
+	}
+
+	/// <summary>
+	/// Проверяет наличие следующего элемента.
+	/// </summary>
+	/// <returns>Результат проверки.</returns>
+	public bool HasNext() => _index < _aggregate.Count;
+
+	/// <summary>
+	/// Получение следующего элемента из файловой системы.
+	/// </summary>
+	/// <returns>Следующий файл.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">Индекс вышел за границы!</exception>
+	public File Next()
+	{
+		if (!HasNext())
+		{
+			throw new ArgumentOutOfRangeException("Индекс вышел за границы!");
+		}
+
+		return _aggregate[_index++];
+	}
+}
+```
+:white_check_mark: __Преимущества паттерна Iterator__: достигается упрощение классов хранения данных<br>
+:x: __Недостатки__: Если вы работаете только с простыми коллекциями, то вам нет необходимости использовать данный паттерн.
+___
+### Наблюдатель
+__Наблюдатель (Observer)__ - поведенческий шаблон проектирования. Определяет зависимость типа «один ко многим» таким образом, что при изменении объекта все, зависящие от него, получают сообщение об этом событии. <br>
+В dotnet есть три способа реализации данного паттерна:<br><br>
+:one: __Через делегаты.__ Данный способ гарантирует наличие наблюдателя и подходит, когда нужно реализовать отношение: 1 поставщик – 1 наблюдатель. Также при данном подходе можно получить результат – ответ от подписчика.<br>
+:two: __Через события.__ Любое число подписчиков. Нет гарантии наличия подписчиков. Не предусмотрено получение ответа от подписчика.<br>
+:three: __Через набор интерфейсов IObserver__ (механизм для получения push-уведомлений)/IObservable (определяет поставщика push-уведомлений).<br>
+> :x: Почему стоит использовать эти интерфейсы вместо событий: события плохо поддаются тестированию, данный паттерн универсален, он может использоваться и в других языках программирования. В C# есть события, а в других языках программирования их может и не быть.
+
+:grey_exclamation: Таким образом, у нас есть __IObservable__ – определяет наблюдаемый объект и __IObserver__ – определяет наблюдателей.<br><br>
+Реализуем паттерн __наблюдатель__ на примере __корпоративного портала для сотрудников__. У нас будут пользователи корпоративного портала - сотрудники компании. <br>
+Сотрудники могут подписываться на уведомления о каких-либо новостях, событиях, которые будут публиковаться на корпоративном портале.<br>
+Соответственно, все пользователи, которые подписаны на уведомления корпоративного портала (подписчики) будут уведомлены о каком-либо событии. В данном случае корпоративный портал будет __поставщиком данных__ для наших подписчиков. <br><br>
+:one: Создаем класс Message, который будет являться объектом сообщения (уведомления), которое будут получать подписчики от поставщика данных - в нашем случае корпоративного портала.
+```C#
+/// <summary>
+/// Сообщение.
+/// </summary>
+public class Message
+{
+	/// <summary>
+	/// Текст сообщения.
+	/// </summary> 
+	private string _text;
+
+	/// <summary>
+	/// Автор сообщения.
+	/// </summary>
+	private string _author;
+
+	/// <summary>
+	/// Создание сообщения с помощью указанных данных.
+	/// </summary>
+	/// <param name="text">Текст сообщения.</param>
+	/// <param name="author">Автор сообщения.</param>
+	public Message(string text, string author)
+	{
+		Validator.ValidateStringText(text);
+		Validator.ValidateStringText(author);
+
+		_text = text;
+		_author = author;
+	}
+ 
+	/// <summary>
+	/// Строковое представление объекта сообщения.
+	/// </summary>
+	/// <returns>Данные сообщения в виде строки.</returns>
+	public override string ToString() => $"Текст сообщения: {Environment.NewLine}{_text}" +
+		$"{Environment.NewLine}Автор: {_author}";
+}
+```
+:two: Далее мы создаем объект пользователя, реализующего интерфейс IObserver, поскольку он является наблюдателем. Параметром интерфейса выступает __Message__ - тип данных уведопления, которое будут получать подписчики.<br>
+Реализуя данный интерфейс, нам необходимо реализовать логику работы методов __OnCompleted, OnError, OnNext__.
+```C#
+/// <summary>
+/// Пользователь.
+/// </summary>
+public class User : IObserver<Message>
+{
+	/// <summary>
+	/// Логин пользователя.
+	/// </summary>
+	private string _login; 
+
+	/// <summary>
+	/// Создает пользователя с помощью указанных параметров.
+	/// </summary>
+	/// <param name="login">Логин пользователя.</param>
+	/// <exception cref="ArgumentNullException">Логин равен null!</exception>
+	public User(string login)
+	{
+		Validator.ValidateStringText(login);
+
+		_login = login;
+	}
+ 
+	/// <summary>
+	/// Обработчик события, когда от поставщика данных больше не будет поступать никаких уведомлений.
+	/// </summary>
+	public void OnCompleted()
+	{
+
+	}
+
+	/// <summary>
+	/// Обработчик события возникновения исключения у поставщика данных при отправке уведомлений.
+	/// </summary>
+	/// <param name="error">Исключение, которое возникло у поставщика данных.</param>
+	/// <exception cref="ArgumentNullException">Исключение равно null!</exception>
+	public void OnError(Exception error)
+	{
+		if (error == null)
+		{
+			throw new ArgumentNullException(nameof(error), "Исключение равно null!");
+		}
+
+		Console.WriteLine($"Отправка уведомлений пользователю завершилась с ошибкой: {error.Message}" +
+			$"{Environment.NewLine}Логин получателя: {_login}");
+	}
+
+	/// <summary>
+	/// Обработчик события поступления уведомлений от поставщика данных.
+	/// </summary>
+	/// <param name="value">Сообщение, поступившее от поставщика данных.</param>
+	/// <exception cref="ArgumentNullException">Сообщение равно null!</exception>
+	public void OnNext(Message value)
+	{
+		if (value == null)
+		{
+			throw new ArgumentNullException(nameof(value), "Сообщение равно null!");
+		}
+
+		Console.WriteLine($"Полученное уведомление: {Environment.NewLine}{value}{Environment.NewLine}" +
+			$"Логин получателя: {_login}");
+	}
+```
+:three: Теперь создадим класс нашего корпоративного портала, реализующий интерфейс IObservable (наблюдаемый объект). В качестве параметра также выступает тип данных Message - тип сообщения для подписчиков.
+```C#
+/// <summary>
+/// Корпоративный портал.
+/// </summary>
+public class CorporatePortal : IObservable<Message>
+{
+	/// <summary>
+	/// Список подписчиков.
+	/// </summary>
+	private readonly List<IObserver<Message>> _observers; 
+
+	/// <summary>
+	/// Создание корпоративного портала.
+	/// </summary>
+	public CorporatePortal()
+	{
+		_observers = new List<IObserver<Message>>();
+	}
+
+	/// <summary>
+	/// Подписка на уведомления.
+	/// </summary>
+	/// <param name="observer">Подписчик.</param>
+	/// <returns>Объект с механизмом освобождения неуправляемых ресурсов.</returns>
+	/// <exception cref="ArgumentNullException">Подписчик равен null!</exception>
+	public IDisposable Subscribe(IObserver<Message> observer)
+	{
+		if (observer == null)
+		{
+			throw new ArgumentNullException(nameof(observer), "Подписчик равен null!");
+		}
+
+		_observers.Add(observer);
+
+		return new Unsubscriber<Message>(_observers, observer); // Данные класс будет реализован далее.
+	}
+
+	/// <summary>
+	/// Отправляет уведомление всем подписчикам.
+	/// </summary>
+	/// <param name="message">Сообщение, которое будет отправлено всем подписчикам.</param>
+	/// <exception cref="ArgumentNullException">Сообщение равно null!</exception>
+	public void Notify(Message message)
+	{
+		if (message == null)
+		{
+			throw new ArgumentNullException(nameof(message), "Сообщение равно null!");
+		}
+
+		foreach (var observer in _observers)
+		{
+			observer.OnNext(message);
+		}
+	}
+}
+```
+> Несколько комментариев касательно Unsubscriber: нам необходимо, чтобы помимо подписки на событие, у пользователя была возможность и отписаться от события. В Unsubscriber должен храниться список всех подписчиков и конкретный подписчик, с которым будет происходить взаимодействие.
+
+:four: Теперь давайте реализуем данный класс. <br><br>
+:pushpin: __Обратите внимание__, что он должен реализовывать интерфейс __IDisposable__, в котором содержится метод Dispose - именно так будет происходить отписка пользователя от уведомлений корпоративного портала.
+```C#
+/// <summary>
+/// Работает с отписками от уведомлений.
+/// </summary>
+/// <typeparam name="T">Тип подписчика.</typeparam>
+public class Unsubscriber<T> : IDisposable
+{
+	/// <summary>
+	/// Список подписчиков.
+	/// </summary>
+	private readonly List<IObserver<T>> _observers; 
+
+	/// <summary>
+	/// Подписчик.
+	/// </summary>
+	private readonly IObserver<T> _observer;
+
+	/// <summary>
+	/// Создание экземпляра для отписок от уведомлений с помощью указанных данных.
+	/// </summary>
+	/// <param name="observers">Подписчики.</param>
+	/// <param name="observer">Подписчик.</param>
+	/// <exception cref="ArgumentNullException">Подписчики равны null!</exception>
+	public Unsubscriber(List<IObserver<T>> observers, IObserver<T> observer)
+	{
+		if (observers == null || observers.FindIndex(subscriber => subscriber == null) != -1)
+		{
+			throw new ArgumentNullException(nameof(observers),
+				"Список подписчиков или его элементы равны null!");
+		}
+
+		if (observer == null)
+		{
+			throw new ArgumentNullException(nameof(observer), "Подписчик равен null!");
+		}
+
+		if (!observers.Contains(observer))
+		{
+			throw new ArgumentNullException(nameof(observer),
+				"Подписчик не найден в списке подписчиков!");
+		}
+
+		_observer = observer;
+		_observers = observers;
+	}
+ 
+	/// <summary>
+	/// Отписка подписчика от уведомлений.
+	/// </summary>
+	public void Dispose()
+	{
+		if (_observers.Contains(_observer))
+		{
+			_observers.Remove(_observer);
+		}
+	}
+}
+```
+Отписка у нас происходит следующим образом: мы удаляем подписчика из нашей коллекции подписчиков, соответственно, ему больше не будут приходить уведомления корпоративного портала.<br><br>
+:white_check_mark: __Преимущества паттерна Observer__: Можно создавать новые классы подписчиков. При этот класс наблюдаемого объекта как-то изменять не нужно.<br>
+:x: __Недостатки__: Подписчики уведомляются в произвольном порядке.
+___
