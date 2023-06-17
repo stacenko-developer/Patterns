@@ -1352,3 +1352,37 @@ public abstract class Accounting
         }
 }
 ```
+:three: Теперь реализуем первый класс-наследник базового класса Accounting - пусть это будет бухгалтерия __Сбера__ (SberAccounting). В Сбере сотрудникам помимо заработной платы выдается еще и фиксированная премия. Это значит, что нам необходимо изменить логику расчета зарплаты для сотрудников Сбера:
+```C#
+/// <summary>
+/// Бухгалтерия Сбера.
+/// </summary>
+public class SberAccounting : Accounting
+{
+        /// <summary>
+        /// Премия.
+        /// </summary>
+        private decimal _prize = 5000;
+
+        /// <summary>
+        /// Создание бухгалтерии Сбера.
+        /// </summary>
+        public SberAccounting() 
+        {
+            _workers = new List<Worker>();
+
+            _workersSalary = new Dictionary<string, decimal>
+            {
+                {"Менеджер", 30000 },
+                {"Программист", 100000 }
+            };
+        }
+
+        /// <summary>
+        /// Получение расчитанной зарплаты сотрудника.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <returns>Расчитанная зарплата.</returns>
+        protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) + _prize;
+}
+```
