@@ -978,4 +978,57 @@ public abstract class Worker
 ```
 :three: Теперь создадим первый класс-наследник нашего Worker: это будет класс Programmer. У него будет два метода: начать работу и закончить работу. Причем программисту нельзя давать новую задачу, пока он не завершил предыдущую. 
 ```C#
+/// <summary>
+/// Программист.
+/// </summary>
+public class Programmer : Worker
+{
+	/// <summary>
+	/// Текст задачи,над которой работает программист.
+	/// </summary>
+	private string _taskText = string.Empty;
+
+	/// <summary>
+	/// Получение текста задания.
+	/// </summary>
+	public string TaskText => _taskText;
+
+	/// <summary>
+	/// Начинает работу над задачей.
+	/// </summary>
+	/// <param name="taskText">Текст задачи.</param>
+	public void StartWork(string taskText)
+	{
+		Validator.ValidateStringText(taskText);
+
+		if (_taskText.Length != 0)
+		{
+			if (_mediator != null)
+			{
+				_mediator.Notify(this, "Программист уже работает над задачей!");
+			}
+
+			return;
+		}
+
+		_taskText = taskText;
+
+		if (_mediator != null)
+		{
+			_mediator.Notify(this, $"Программист начал работу над задачей: {taskText}");
+		}
+	}
+
+	/// <summary>
+	/// Завершает работу над задачей.
+	/// </summary>
+	public void FinishWork()
+	{
+		if (_mediator != null)
+		{
+			_mediator.Notify(this, $"Программист завершил работу над задачей: {_taskText}");
+		}
+		_taskText = string.Empty;
+	}
+}
 ```
