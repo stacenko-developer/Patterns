@@ -1420,3 +1420,6 @@ public class OzonAccounting : Accounting
         protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) - _taxiCostByMonth;
 }
 ```
+:white_check_mark: __Преимущества паттерна Template Method__: Сокращение дублирования кода <br>
+:x: __Недостатки__: По мере роста шагов в шаблонном методе возникают проблемы с его дальнейшей поддержкой.<br>
+___
