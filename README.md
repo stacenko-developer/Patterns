@@ -1054,3 +1054,99 @@ public class TeamLead : Worker
 	}
 }
 ```
+:five: Теперь мы можем написать класс TFS, который будет реализовывать интерфейс посредника IMediator. Класс внутри будет содержать объекты тимлида и программиста, посредниками которых он является. Также у нас будет список задач. С помощью метода AddTask мы можем добавить задачу в список. В конструкторе мы не только инициализируем тимлида и программиста, но и устанавливаем им текущего посредника.<br><br>
+Логика работы метода Notify следующая: если уведомление посреднику отправляет тимлид, то это означает, что он дает задачу сотруднику, значит сотрудник должен приступить к работе. Если уведомление приходит от сотрудника, то это означает, что он выполнил задачу и тимлид дает ему новую задачу: он будет давать новые задачи до тех пор, пока список задач не станет пустым.
+```C#
+/// <summary>
+/// TFS.
+/// </summary>
+public class TFS : IMediator
+{
+	/// <summary>
+	/// Программист.
+	/// </summary>
+	private Programmer _programmer;
+
+	/// <summary>
+	/// Тимлид.
+	/// </summary>
+	private TeamLead _teamLead;
+
+	/// <summary>
+	/// Задачи.
+	/// </summary>
+	private List<string> _tasks;
+
+	/// <summary>
+	/// Создает TFS с помощью указанных данных.
+	/// </summary>
+	/// <param name="programmer">Программист.</param>
+	/// <param name="teamLead">Тимлид.</param>
+	/// <exception cref="ArgumentNullException">Программист или тимлид равен null!</exception>
+	public TFS(Programmer programmer, TeamLead teamLead)
+	{
+		if (programmer == null)
+		{
+			throw new ArgumentNullException(nameof(programmer), "Программист равен null!");
+		}
+
+		if (teamLead == null)
+		{
+			throw new ArgumentNullException(nameof(teamLead), "Тимлид равен null!");
+		}
+
+		_programmer = programmer;
+		_teamLead = teamLead;
+		programmer.SetMediator(this);
+		teamLead.SetMediator(this);
+		_tasks = new List<string>();
+	}
+
+	/// <summary>
+	/// Обрабатывает уведомления.
+	/// </summary>
+	/// <param name="worker">Работник.</param>
+	/// <param name="message">Сообщение.</param>
+	public void Notify(Worker worker, string message)
+	{
+		if (worker == null)
+		{
+			throw new ArgumentNullException(nameof(worker), "Работник равен null!");
+		}
+
+		Validator.ValidateStringText(message);
+
+		Console.WriteLine(message);
+
+		if (worker is Programmer)
+		{
+			if (message.StartsWith("Программист завершил работу над задачей"))
+			{
+				if (_tasks.Count != 0)
+				{
+					_teamLead.GiveTask(_tasks[0]);
+					_tasks.RemoveAt(0);
+				}
+			}
+
+			return;
+		}
+
+		if (worker is TeamLead)
+		{
+			_programmer.StartWork(message);
+		}
+	}
+
+	/// <summary>
+	/// Добавить задачу.
+	/// </summary>
+	/// <param name="taskText">Текст задачи.</param>
+	public void AddTask(string taskText)
+	{
+		Validator.ValidateStringText(taskText);
+  
+		_tasks.Add(taskText);
+	}
+}
+```
