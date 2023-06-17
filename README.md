@@ -1386,3 +1386,37 @@ public class SberAccounting : Accounting
         protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) + _prize;
 }
 ```
+:four: Реализуем второй класс-наследник: бухгалтерия Озона (OzonAccounting). У Озона у сотрудников нет премии. Все сотрудники добираются на работу на корпоративном такси, соответственно, ежемесячная плата за корпоративное такси вычитается из их заработной платы. Это означает, что нам также придется переопределить расчет зарплаты и здесь:
+```C#
+/// <summary>
+/// Бухгалтерия Ozon.
+/// </summary>
+public class OzonAccounting : Accounting
+{
+        /// <summary>
+        /// Плата за корпоративное такси в месяц для поезди от дома до работы и обратно.
+        /// </summary>
+        private decimal _taxiCostByMonth = 15000;
+	
+        /// <summary>
+        /// Создание бухгалтерии Озона.
+        /// </summary>
+        public OzonAccounting()
+        {
+            _workers = new List<Worker>();
+
+            _workersSalary = new Dictionary<string, decimal>
+            {
+                { "Менеджер", 40000 },
+                { "Программист", 90000 }
+            };
+        }
+	
+        /// <summary>
+        /// Получение расчитанной зарплаты сотрудника.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <returns>Расчитанная зарплата.</returns>
+        protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) - _taxiCostByMonth;
+}
+```
