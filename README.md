@@ -1032,3 +1032,25 @@ public class Programmer : Worker
 	}
 }
 ```
+:four: Вторым классом-наследником будет наш Тимлид. У него будет метод __GiveTask__ - выдать задачу. 
+```C#
+/// <summary>
+/// Тимлид.
+/// </summary>
+public class TeamLead : Worker
+{
+	/// <summary>
+	/// Дать задание.
+	/// </summary>
+	/// <param name="taskText">Текст задания.</param>
+	public void GiveTask(string taskText)
+	{
+		Validator.ValidateStringText(taskText);
+
+		if (_mediator != null)
+		{
+			_mediator.Notify(this, "Выдаю задачу программисту: " + taskText);
+		}
+	}
+}
+```
