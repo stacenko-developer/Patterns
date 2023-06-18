@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Patterns
+﻿namespace Patterns
 {
     class Program
     {

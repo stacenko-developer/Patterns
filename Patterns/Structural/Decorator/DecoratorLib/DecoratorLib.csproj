@@ -53,7 +53,7 @@
     <Compile Include="WorkersFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Validator\Validator.csproj">
+    <ProjectReference Include="..\..\..\..\Validator\Validator.csproj">
       <Project>{177c3649-0711-43ac-b95d-6b670ea9479e}</Project>
       <Name>Validator</Name>
     </ProjectReference>
