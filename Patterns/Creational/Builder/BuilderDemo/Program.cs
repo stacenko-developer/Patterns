@@ -17,7 +17,14 @@
         /// </summary>
         private static void RunDemo()
         {
-            
+            Console.WriteLine($"Создание полноценного компьютера HP:{Environment.NewLine}" +
+                $"{new Director(new HPComputerDeveloper()).CreateFullComputer()}{Environment.NewLine}" +
+                $"Создание компьютера HP без операционной системы:{Environment.NewLine}" +
+                $"{new Director(new HPComputerDeveloper()).CreateComputerWithoutOperationSystem()}{Environment.NewLine}{Environment.NewLine}" +
+                $"Создание полноценного компьютера DELL:{Environment.NewLine}" +
+                $"{new Director(new DELLComputerDeveloper()).CreateFullComputer()}{Environment.NewLine}" +
+                $"Создание полноценного компьютера DELL:{Environment.NewLine}" +
+                $"{new Director(new DELLComputerDeveloper()).CreateComputerWithoutOperationSystem()}{Environment.NewLine}");
         }
         #endregion
     }

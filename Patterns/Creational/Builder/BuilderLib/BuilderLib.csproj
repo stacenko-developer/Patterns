@@ -41,6 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Computer.cs" />
+    <Compile Include="DELLComputerDeveloper.cs" />
+    <Compile Include="Director.cs" />
+    <Compile Include="HPComputerDeveloper.cs" />
+    <Compile Include="IComputerDeveloper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
