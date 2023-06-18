@@ -20,6 +20,7 @@
     1. [Итератор (Iterator)](#Итератор)
     2. [Наблюдатель (Observer)](#Наблюдатель)
     3. [Посредник (Mediator)](#Посредник)
+    4. [Шаблонный метод (Template Method)](#Шаблонный-метод)
 4. [Архитектурные (Architectural)](#Архитектурные-паттерны)
     1. [Внедрение зависимостей (Dependency Injection)](#Внедрение-зависимостей)
 
@@ -921,4 +922,504 @@ public class Unsubscriber<T> : IDisposable
 Отписка у нас происходит следующим образом: мы удаляем подписчика из нашей коллекции подписчиков, соответственно, ему больше не будут приходить уведомления корпоративного портала.<br><br>
 :white_check_mark: __Преимущества паттерна Observer__: Можно создавать новые классы подписчиков. При этот класс наблюдаемого объекта как-то изменять не нужно.<br>
 :x: __Недостатки__: Подписчики уведомляются в произвольном порядке.
+___
+### Посредник 
+__Посредник (Mediator)__ - это поведенческий паттерн проектирования, бгагодаря которому уменьшается связанность множества классов между собой. Это достигается за счет перемещения этих связей в один класс-посредник.<br>
+Самое популярное применение посредника в C# коде – это связь нескольких компонентов __GUI__ одной программы. __Аналогия из жизни__: пилоты не общаются напрямую друг с другом, а через диспетчера.<br><br>
+Давайте попробуем реализовать данный паттерн на __следующем примере__: пусть у нас есть какая-то IT-компания, в которой есть программист и тимлид. Тимлид не скидывает лично (напрямую) программисту задачу, например, в социальных сетях. Он публикует ее в __TFS__ (Team Foundation Server). <br> 
+
+Программист заходит на TFS, чтобы проверить, не появилось ли для него задач. Если задачи есть - берет их в работу. После выполнения задачи, программист переводит ее в "ожидающие проверки". Тимлид также заходит на TFS, чтобы проверить, выполнил ли программист задачи, которые он выдал. Если сделал - проверяет их. Если есть недочеты - отправляет на доработку, если недочетов нет - закрывает задачу. Также тимлид может дать программисту новые задачи для выполнения, если таковые имеются. <br>
+
+> В нашем примере посредником (Mediator) будет является TFS между программистом и тимлидом.
+
+Теперь реализуем это в коде.<br>
+:one: Создадим интерфейс __IMediator__ - он будет содержать методы, которыми будет обладать класс-посредник. С помощью метода __Notify__ посредник будет уведомлять обе стороны о каком-либо событии.
+```C#
+/// <summary>
+/// Содержит методы для посредника.
+/// </summary>
+public interface IMediator
+{
+	/// <summary>
+	/// Обрабатывает уведомления.
+	/// </summary>
+	/// <param name="worker">Работник.</param>
+	/// <param name="message">Сообщение.</param>
+	void Notify(Worker worker, string message);
+}
+```
+:two: Теперь реализуем абстрактный класс Worker - это будет наш сотрудник. Он будет хранить посредника - его можно будет установить в методе __SetMediator__:
+```C#
+/// <summary>
+/// Работник.
+/// </summary>
+public abstract class Worker
+{
+	/// <summary>
+	/// Посредник.
+	/// </summary>
+	protected IMediator _mediator;
+
+	/// <summary>
+	///Устанавливает посредника для работника.
+	/// </summary>
+	/// <param name="mediator">Посредник.</param>
+	/// <exception cref="ArgumentNullException">Посредник равен null!</exception>
+	public void SetMediator(IMediator mediator)
+	{
+		if (mediator == null)
+		{
+			throw new ArgumentNullException(nameof(mediator), "Посредник равен null!");
+		}
+
+		_mediator = mediator;
+	}
+}
+```
+:three: Теперь создадим первый класс-наследник нашего Worker: это будет класс Programmer. У него будет два метода: начать работу и закончить работу. Причем программисту нельзя давать новую задачу, пока он не завершил предыдущую. 
+```C#
+/// <summary>
+/// Программист.
+/// </summary>
+public class Programmer : Worker
+{
+	/// <summary>
+	/// Текст задачи,над которой работает программист.
+	/// </summary>
+	private string _taskText = string.Empty;
+
+	/// <summary>
+	/// Получение текста задания.
+	/// </summary>
+	public string TaskText => _taskText;
+
+	/// <summary>
+	/// Начинает работу над задачей.
+	/// </summary>
+	/// <param name="taskText">Текст задачи.</param>
+	public void StartWork(string taskText)
+	{
+		Validator.ValidateStringText(taskText);
+
+		if (_taskText.Length != 0)
+		{
+			if (_mediator != null)
+			{
+				_mediator.Notify(this, "Программист уже работает над задачей!");
+			}
+
+			return;
+		}
+
+		_taskText = taskText;
+
+		if (_mediator != null)
+		{
+			_mediator.Notify(this, $"Программист начал работу над задачей: {taskText}");
+		}
+	}
+
+	/// <summary>
+	/// Завершает работу над задачей.
+	/// </summary>
+	public void FinishWork()
+	{
+		if (_mediator != null)
+		{
+			_mediator.Notify(this, $"Программист завершил работу над задачей: {_taskText}");
+		}
+		_taskText = string.Empty;
+	}
+}
+```
+:four: Вторым классом-наследником будет наш Тимлид. У него будет метод __GiveTask__ - выдать задачу. 
+```C#
+/// <summary>
+/// Тимлид.
+/// </summary>
+public class TeamLead : Worker
+{
+	/// <summary>
+	/// Дать задание.
+	/// </summary>
+	/// <param name="taskText">Текст задания.</param>
+	public void GiveTask(string taskText)
+	{
+		Validator.ValidateStringText(taskText);
+
+		if (_mediator != null)
+		{
+			_mediator.Notify(this, "Выдаю задачу программисту: " + taskText);
+		}
+	}
+}
+```
+:five: Теперь мы можем написать класс TFS, который будет реализовывать интерфейс посредника IMediator. Класс внутри будет содержать объекты тимлида и программиста, посредниками которых он является. Также у нас будет список задач. С помощью метода AddTask мы можем добавить задачу в список. В конструкторе мы не только инициализируем тимлида и программиста, но и устанавливаем им текущего посредника.<br><br>
+Логика работы метода Notify следующая: если уведомление посреднику отправляет тимлид, то это означает, что он дает задачу сотруднику, значит сотрудник должен приступить к работе. Если уведомление приходит от сотрудника, то это означает, что он выполнил задачу и тимлид дает ему новую задачу: он будет давать новые задачи до тех пор, пока список задач не станет пустым.
+```C#
+/// <summary>
+/// TFS.
+/// </summary>
+public class TFS : IMediator
+{
+	/// <summary>
+	/// Программист.
+	/// </summary>
+	private Programmer _programmer;
+
+	/// <summary>
+	/// Тимлид.
+	/// </summary>
+	private TeamLead _teamLead;
+
+	/// <summary>
+	/// Задачи.
+	/// </summary>
+	private List<string> _tasks;
+
+	/// <summary>
+	/// Создает TFS с помощью указанных данных.
+	/// </summary>
+	/// <param name="programmer">Программист.</param>
+	/// <param name="teamLead">Тимлид.</param>
+	/// <exception cref="ArgumentNullException">Программист или тимлид равен null!</exception>
+	public TFS(Programmer programmer, TeamLead teamLead)
+	{
+		if (programmer == null)
+		{
+			throw new ArgumentNullException(nameof(programmer), "Программист равен null!");
+		}
+
+		if (teamLead == null)
+		{
+			throw new ArgumentNullException(nameof(teamLead), "Тимлид равен null!");
+		}
+
+		_programmer = programmer;
+		_teamLead = teamLead;
+		programmer.SetMediator(this);
+		teamLead.SetMediator(this);
+		_tasks = new List<string>();
+	}
+
+	/// <summary>
+	/// Обрабатывает уведомления.
+	/// </summary>
+	/// <param name="worker">Работник.</param>
+	/// <param name="message">Сообщение.</param>
+	public void Notify(Worker worker, string message)
+	{
+		if (worker == null)
+		{
+			throw new ArgumentNullException(nameof(worker), "Работник равен null!");
+		}
+
+		Validator.ValidateStringText(message);
+
+		Console.WriteLine(message);
+
+		if (worker is Programmer)
+		{
+			if (message.StartsWith("Программист завершил работу над задачей"))
+			{
+				if (_tasks.Count != 0)
+				{
+					_teamLead.GiveTask(_tasks[0]);
+					_tasks.RemoveAt(0);
+				}
+			}
+
+			return;
+		}
+
+		if (worker is TeamLead)
+		{
+			_programmer.StartWork(message);
+		}
+	}
+
+	/// <summary>
+	/// Добавить задачу.
+	/// </summary>
+	/// <param name="taskText">Текст задачи.</param>
+	public void AddTask(string taskText)
+	{
+		Validator.ValidateStringText(taskText);
+  
+		_tasks.Add(taskText);
+	}
+}
+```
+:white_check_mark: __Преимущества паттерна Mediator__: Достигается устранение зависимости между компонентами, благодаря чему их можно повторно использовать, более удобным становится взаимодействие между компонентами, также управление компонентами централизовано<br>
+:x: __Недостатки__: Код посредника может быть очень большим.
+___
+### Шаблонный метод
+__Шаблонный метод__ (Template Method) - это поведенческий паттерн проектирования, который определяет общий алгоритм поведения подклассов. При этом подклассы имеют возможность переопределять части этого алгоритма, не меняя при этом его общей структуры.
+> :white_check_mark: Если бы мы не использовали данный паттерн, то нам приходилось бы явно прописывать реализацию алгоритма в каждой подклассе, несмотря на то, что алгоритмы в этих подклассах имеют небольшие различия.
+
+Рассмотрим реализацию шаблонного метода на конкретном примере: пусть у нас будет бухгалтерия, в котором выдают зарплату для сотрудников.<br>
+:one: Реализуем класс Worker, содержащий необходимые свойства, которыми будет обладать каждый сотрудник. 
+```C#
+/// <summary>
+/// Сотрудник.
+/// </summary>
+public class Worker
+{
+        /// <summary>
+        /// Идентификатор.
+        /// </summary>
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// Имя.
+        /// </summary>
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// Фамилия.
+        /// </summary>
+        public string LastName { get; set; }    
+
+        /// <summary>
+        /// Отчество.
+        /// </summary>
+        public string Patronymic { get; set; }
+
+        /// <summary>
+        /// Должность.
+        /// </summary>
+        public string Post { get; set; }
+
+        /// <summary>
+        /// Выплачена ли зарплата.
+        /// </summary>
+        public bool IsSalaryPaid { get; set; }
+}
+```
+:two: Реализуем абстрактный класс бухгалтерии, в которой из полей будет список сотрудников типа Worker, которые работают в конкретной компании и словарь, в котором в зависимости от должности указана зарплата, которую должен получать сотрудник, занимая определенную должность.<br><br> 
+Нам необходимо выдать зарплату сотруднику - за это отвечает метод __GetSalary__. Алгоритм выдачи зарплаты следующий: <br>
+1. Сначала вызывается метод __ValidateWorkerId__, проверяющий корректности идентификатора сотрудника, которому необходимо выдать зарплату - он не должен быть null.<br>
+2. Далее вызывается метод __ValidateWorkerExistence__, проверяющий существование сотрудника с указанным идентификатором.<br>
+3. Затем вызывается метод __ValidatePaidSalary__, проверяющий, получал ли работник зарплату ранее, если он ее уже получил, то повторно она выплачиваться не должна.<br>
+4. Последний этап - вызывается метод __GetCalculationSalary__, который расчитывает зарплату в зависимости от должности - он будет виртуальным. Это означает, что классы-наследники могут его переопределить, а могут и не переопределять, поскольку в базовом классе прописана его реализация по умолчанию. Результат метода GetCalculationSalary и будет возвращаться методом GetSalary.<br>
+> __Обратите внимание__, что нам нет смысла переопределять методы из первых трех пунктов - неважно, какой компании является бухгалтерия. То есть в абсолютно любой бухгалтерии прежде чем выдать сотруднику зарплату, необходимо выполнить первые три пункта (возможно больше, в примере представлена упрощенная версия, чтобы было более понятно назначение паттерна.
+
+:white_check_mark: Благодаря шаблонному методу нам не нужно в бухгалтерии каждой компании прописывать выполнение первых трех пунктов, потому что они уже реализованы в базовом классе __Accounting__.
+```C#
+/// <summary>
+/// Бухгалтегия.
+/// </summary>
+public abstract class Accounting
+{
+        /// <summary>
+        /// Список сотрудников для выплаты зарплаты.
+        /// </summary>
+        protected List<Worker> _workers = new List<Worker>();
+
+        /// <summary>
+        /// Зарплаты сотрудников.
+        /// </summary>
+        protected Dictionary<string, decimal> _workersSalary = new Dictionary<string, decimal>();
+
+        /// <summary>
+        /// Создание бухгалтерии.
+        /// </summary>
+        public Accounting()
+        {   
+            _workers = new List<Worker>();
+            _workersSalary = new Dictionary<string, decimal>();
+        }
+
+        /// <summary>
+        /// Проверка корректности идентификатора сотрудника.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Идентификатор сотрудника равен null!</exception>
+        protected void ValidateWorkerId(Guid id)
+        {
+            if (id == null)
+            {
+                throw new ArgumentNullException(nameof(id), "Идентификатор сотрудника равен null!");
+            }
+        }
+
+        /// <summary>
+        /// Проверка наличия сотрудника в базе.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника, которого необходимо проверить.</param>
+        protected void ValidateWorkerExistence(Guid id)
+        {
+            if (_workers.FirstOrDefault(worker => worker.Id == id) == null) 
+            {
+                throw new ArgumentNullException(nameof(id), "Сотрудник с указанным идентификатором не найден!");
+            }
+        }
+
+        /// <summary>
+        /// Проверка того, была ли выплачена зарплата работнику ранее.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Данному сотруднику уже выплачена зарплата!</exception>
+        protected void ValidatePaidSalary(Guid id)
+        {
+            if (_workers.FirstOrDefault(worker => worker.Id == id).IsSalaryPaid)
+            {
+                throw new ArgumentOutOfRangeException("Данному сотруднику уже выплачена зарплата!");
+            }
+        }
+
+        /// <summary>
+        /// Получение расчитанной зарплаты сотрудника.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <returns>Расчитанная зарплата.</returns>
+        protected virtual decimal GetCalculationSalary(Guid id)
+            => _workersSalary[_workers.FirstOrDefault(worker => worker.Id == id).Post];
+
+        /// <summary>
+        /// Выплата зарплаты сотруднику.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника, которого необходимо проверить.</param>
+        public decimal GetSalary(Guid id)
+        {
+            ValidateWorkerId(id);
+            ValidateWorkerExistence(id);
+            ValidatePaidSalary(id);
+
+            _workers.FirstOrDefault(worker => worker.Id == id).IsSalaryPaid = true;
+
+            return GetCalculationSalary(id);
+        }
+
+        /// <summary>
+        /// Добавление сотрудника в базу бухгалтерии.
+        /// </summary>
+        /// <param name="firstName">Имя.</param>
+        /// <param name="lastName">Фамилия.</param>
+        /// <param name="patronymic">Отчество.</param>
+        /// <param name="post">Должность.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Сотрудник с указанными данными уже есть в базе!</exception>
+        /// <exception cref="ArgumentNullException">Указанная должность в бухгалтерии не найдена!</exception>
+        public Guid AddWorker(string firstName, string lastName, string patronymic, string post)
+        {
+            Validator.ValidateStringText(firstName);
+            Validator.ValidateStringText(lastName);
+            Validator.ValidateStringText(patronymic);
+            Validator.ValidateStringText(post);
+
+            if (!_workersSalary.ContainsKey(post))
+            {
+                throw new ArgumentNullException("Указанная должность в бухгалтерии не найдена!");
+            }
+
+            var id = Guid.NewGuid();
+
+            _workers.Add(new Worker
+            {
+                Id = id,
+                FirstName = firstName,
+                LastName = lastName,
+                Patronymic = patronymic,
+                Post = post,
+                IsSalaryPaid = false
+            });
+
+            return id;
+        }
+
+        /// <summary>
+        /// Получение сотрудника по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <returns>Сотрудника.</returns>
+        public Worker GetWorker(Guid id)
+        {
+            ValidateWorkerId(id);
+            ValidateWorkerExistence(id);
+
+            return _workers.First(worker => worker.Id == id);
+        }
+
+        /// <summary>
+        /// Удаляет сотрудника из базы.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника, которого необходимо удалить.</param>
+        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не найден в базе!</exception>
+        public void DeleteWorker(Guid id)
+        {
+            ValidateWorkerExistence(id);
+
+            _workers.Remove(_workers.FirstOrDefault(worker => worker.Id == id));
+        }
+}
+```
+:three: Теперь реализуем первый класс-наследник базового класса Accounting - пусть это будет бухгалтерия __Сбера__ (SberAccounting). В Сбере сотрудникам помимо заработной платы выдается еще и фиксированная премия. Это значит, что нам необходимо изменить логику расчета зарплаты для сотрудников Сбера:
+```C#
+/// <summary>
+/// Бухгалтерия Сбера.
+/// </summary>
+public class SberAccounting : Accounting
+{
+        /// <summary>
+        /// Премия.
+        /// </summary>
+        private decimal _prize = 5000;
+
+        /// <summary>
+        /// Создание бухгалтерии Сбера.
+        /// </summary>
+        public SberAccounting() 
+        {
+            _workers = new List<Worker>();
+
+            _workersSalary = new Dictionary<string, decimal>
+            {
+                {"Менеджер", 30000 },
+                {"Программист", 100000 }
+            };
+        }
+
+        /// <summary>
+        /// Получение расчитанной зарплаты сотрудника.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <returns>Расчитанная зарплата.</returns>
+        protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) + _prize;
+}
+```
+:four: Реализуем второй класс-наследник: бухгалтерия Озона (OzonAccounting). У Озона у сотрудников нет премии. Все сотрудники добираются на работу на корпоративном такси, соответственно, ежемесячная плата за корпоративное такси вычитается из их заработной платы. Это означает, что нам также придется переопределить расчет зарплаты и здесь:
+```C#
+/// <summary>
+/// Бухгалтерия Ozon.
+/// </summary>
+public class OzonAccounting : Accounting
+{
+        /// <summary>
+        /// Плата за корпоративное такси в месяц для поезди от дома до работы и обратно.
+        /// </summary>
+        private decimal _taxiCostByMonth = 15000;
+	
+        /// <summary>
+        /// Создание бухгалтерии Озона.
+        /// </summary>
+        public OzonAccounting()
+        {
+            _workers = new List<Worker>();
+
+            _workersSalary = new Dictionary<string, decimal>
+            {
+                { "Менеджер", 40000 },
+                { "Программист", 90000 }
+            };
+        }
+	
+        /// <summary>
+        /// Получение расчитанной зарплаты сотрудника.
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника.</param>
+        /// <returns>Расчитанная зарплата.</returns>
+        protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) - _taxiCostByMonth;
+}
+```
+:white_check_mark: __Преимущества паттерна Template Method__: Сокращение дублирования кода <br>
+:x: __Недостатки__: По мере роста шагов в шаблонном методе возникают проблемы с его дальнейшей поддержкой.<br>
 ___
