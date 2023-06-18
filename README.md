@@ -335,6 +335,78 @@ public interface IComputerDeveloper
 }
 ```
 :three: Затем создадим классы HPComputerDeveloper (разработчик компьютеров HP) и DELLComputerDeveloper (Разработчик компьютеров DELL), в которых будет реализован интерфейс IComputerDeveloper. Рассмотрим реализация класса HPComputerDeveloper, класс DELLComputerDeveloper реализован аналогично.
+```C#
+/// <summary>
+/// Разработчик компьютеров HP.
+/// </summary>
+public class HPComputerDeveloper : IComputerDeveloper
+{
+        /// <summary>
+        /// Компьютер.
+        /// </summary>
+        private Computer _computer;
+
+        /// <summary>
+        /// Модель.
+        /// </summary>
+        private string _model = "HP";
+
+        /// <summary>
+        /// Процессор.
+        /// </summary>
+        private string _processor = "Intel Core i5-7400";
+
+        /// <summary>
+        /// Количество оперативной памяти.
+        /// </summary>
+        private int _randomAccessMemoryCount = 8;
+
+        /// <summary>
+        /// Операционная система.
+        /// </summary>
+        private string _operationSystem = "Windows 10 Pro";
+
+        /// <summary>
+        /// Создание разработчика компьютеров HP.
+        /// </summary>
+        public HPComputerDeveloper() 
+        {
+            _computer = new Computer();
+            _computer.Model = _model;
+        }
+
+        /// <summary>
+        /// Установка процессора.
+        /// </summary>
+        public void SetProcessor()
+        {
+            _computer.Processor = _processor;
+        }
+
+        /// <summary>
+        /// Установка оперативной памяти.
+        /// </summary>
+        public void SetRandomAccessMemory()
+        {
+            _computer.RandomAccessMemory = _randomAccessMemoryCount;
+        }
+
+        /// <summary>
+        /// Установка операционной системы.
+        /// </summary>
+        public void SetOperationSystem()
+        {
+            _computer.OperationSystem = _operationSystem;
+        }
+
+        /// <summary>
+        /// Получение компьютера.
+        /// </summary>
+        /// <returns>Компьютер.</returns>
+        public Computer GetComputer() => _computer;
+}
+:four: Теперь создадим класс Director, который будет иметь поле IComputerDeveloper, то есть, он будет принимать в конструкторе одного из разработчиков компьютеров и в зависимости от разработчика создавать определенный компьютер.
+```
 ## Структурные паттерны
 __Структурные паттерны__ (Structural) - цель их применения заключается в том, что благодаря им вы можете совмещать и сочетать сущности вместе.
 ___
