@@ -38,7 +38,6 @@ namespace Patterns
         /// <param name="id">Идентификатор сотрудника.</param>
         /// <returns>Расчитанная зарплата.</returns>
         protected override decimal GetCalculationSalary(Guid id) => base.GetCalculationSalary(id) + _prize;
-
         #endregion
     }
 }
