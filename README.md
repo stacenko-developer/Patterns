@@ -275,6 +275,195 @@ __Строитель (Builder)__ - это порождающий паттерн 
 Паттерн Builder (Строитель) состоить из двух участников:
 * __Строитель (Builder)__ – предоставляет методы для сборки частей экземпляра класса;
 * __Распорядитель (Director)__ – определяет саму стратегию того, как будет происходить сборка: определяет, в каком порядке будут вызываться методы Строителя.
+
+Реализуем данный паттерн на основе примера: у нас есть завод по производству компьютеров. У нас есть разработчики компьютеров и директор.<br>
+:one: Создадим класс компьютера, для простоты он будет содержать всего 4 характеристики:
+```C#
+/// <summary>
+/// Содержит методы для разработчика компьютеров.
+/// </summary>
+public interface IComputerDeveloper
+{   
+	/// <summary>
+	/// Установка процессора.
+	/// </summary>
+	void SetProcessor();
+	
+	/// <summary>
+	/// Установка оперативной памяти.
+	/// </summary>
+	void SetRandomAccessMemory();
+	
+	/// <summary>
+	/// Установка операционной системы.
+	/// </summary>
+	void SetOperationSystem();
+	
+	/// <summary>
+	/// Получение компьютера.
+	/// </summary>
+	/// <returns>Компьютер.</returns>
+	Computer GetComputer();
+}
+```
+:two: Теперь создадим интерфейс __IComputerDeveloper__, которые будет содержать методы разработчика компьютеров: 
+```C#
+/// <summary>
+/// Содержит методы для разработчика компьютеров.
+/// </summary>
+public interface IComputerDeveloper
+{   
+        /// <summary>
+        /// Установка процессора.
+        /// </summary>
+        void SetProcessor();
+
+        /// <summary>
+        /// Установка оперативной памяти.
+        /// </summary>
+        void SetRandomAccessMemory();
+
+        /// <summary>
+        /// Установка операционной системы.
+        /// </summary>
+        void SetOperationSystem();
+
+        /// <summary>
+        /// Получение компьютера.
+        /// </summary>
+        /// <returns>Компьютер.</returns>
+        Computer GetComputer();
+}
+```
+:three: Затем создадим классы HPComputerDeveloper (разработчик компьютеров HP) и DELLComputerDeveloper (Разработчик компьютеров DELL), в которых будет реализован интерфейс IComputerDeveloper. Рассмотрим реализация класса HPComputerDeveloper, класс DELLComputerDeveloper реализован аналогично.
+```C#
+/// <summary>
+/// Разработчик компьютеров HP.
+/// </summary>
+public class HPComputerDeveloper : IComputerDeveloper
+{
+        /// <summary>
+        /// Компьютер.
+        /// </summary>
+        private Computer _computer;
+
+        /// <summary>
+        /// Модель.
+        /// </summary>
+        private string _model = "HP";
+
+        /// <summary>
+        /// Процессор.
+        /// </summary>
+        private string _processor = "Intel Core i5-7400";
+
+        /// <summary>
+        /// Количество оперативной памяти.
+        /// </summary>
+        private int _randomAccessMemoryCount = 8;
+
+        /// <summary>
+        /// Операционная система.
+        /// </summary>
+        private string _operationSystem = "Windows 10 Pro";
+
+        /// <summary>
+        /// Создание разработчика компьютеров HP.
+        /// </summary>
+        public HPComputerDeveloper() 
+        {
+            _computer = new Computer();
+            _computer.Model = _model;
+        }
+
+        /// <summary>
+        /// Установка процессора.
+        /// </summary>
+        public void SetProcessor()
+        {
+            _computer.Processor = _processor;
+        }
+
+        /// <summary>
+        /// Установка оперативной памяти.
+        /// </summary>
+        public void SetRandomAccessMemory()
+        {
+            _computer.RandomAccessMemory = _randomAccessMemoryCount;
+        }
+
+        /// <summary>
+        /// Установка операционной системы.
+        /// </summary>
+        public void SetOperationSystem()
+        {
+            _computer.OperationSystem = _operationSystem;
+        }
+
+        /// <summary>
+        /// Получение компьютера.
+        /// </summary>
+        /// <returns>Компьютер.</returns>
+        public Computer GetComputer() => _computer;
+}
+```
+:four: Теперь создадим класс Director, который будет иметь поле IComputerDeveloper, то есть, он будет принимать в конструкторе одного из разработчиков компьютеров и в зависимости от разработчика создавать определенный компьютер.
+```C#
+/// <summary>
+/// Директор.
+/// </summary>
+public class Director
+{
+        /// <summary>
+        /// Разработчик компьютеров.
+        /// </summary>
+        private IComputerDeveloper _computerDeveloper;
+
+        /// <summary>
+        /// Создание директора с помощью указанных параметров.
+        /// </summary>
+        /// <param name="computerDeveloper">Разработчик компьютеров.</param>
+        /// <exception cref="ArgumentNullException">Разработчик компьютеров равен null!</exception>
+        public Director(IComputerDeveloper computerDeveloper) 
+        {
+            if (computerDeveloper == null)
+            {
+                throw new ArgumentNullException(nameof(computerDeveloper), "Разработчик компьютеров равен null!");
+            }
+
+            _computerDeveloper = computerDeveloper;
+        }
+
+        /// <summary>
+        /// Создание полноценного компьютера.
+        /// </summary>
+        /// <returns>Созданный компьютер.</returns>
+        public Computer CreateFullComputer()
+        {
+            _computerDeveloper.SetProcessor();
+            _computerDeveloper.SetRandomAccessMemory();
+            _computerDeveloper.SetOperationSystem();
+
+            return _computerDeveloper.GetComputer();
+        }
+
+        /// <summary>
+        /// Создание компьютера без операционной системы.
+        /// </summary>
+        /// <returns>Созданный компьютер.</returns>
+        public Computer CreateComputerWithoutOperationSystem()
+        {
+            _computerDeveloper.SetProcessor();
+            _computerDeveloper.SetRandomAccessMemory();
+
+            return _computerDeveloper.GetComputer();
+        }
+}
+```
+> За счет того, что мы разбили процесс создания компьютера на отдельный шаги, мы можем создавать разные объекты, например, полноценный компьютер или компьютер без операционной системы.
+
+:white_check_mark: __Преимущества паттерна Builder__: контроль за этапами создания экземпляра класса, в зависимости от этапов можно получить различные объекты.<br>
+:x: __Недостатки__: жесткая связка конкретного Builder и продукта, который он создает. 
 ## Структурные паттерны
 __Структурные паттерны__ (Structural) - цель их применения заключается в том, что благодаря им вы можете совмещать и сочетать сущности вместе.
 ___
