@@ -1,56 +1,56 @@
-namespace Patterns
+п»їnamespace Patterns
 {
     /// <summary>
-	/// Проверка корректности реализации паттерна Builder.
+	/// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР°Р»РёР·Р°С†РёРё РїР°С‚С‚РµСЂРЅР° Builder.
 	/// </summary>
     [TestClass]
     public class BuilderTests
     {
-        #region Поля.
+        #region РџРѕР»СЏ.
         /// <summary>
-        /// Корректное значение модели для компьютера HP.
+        /// РљРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РјРѕРґРµР»Рё РґР»СЏ РєРѕРјРїСЊСЋС‚РµСЂР° HP.
         /// </summary>
         private string _correctDELLModel = "DELL";
 
         /// <summary>
-        /// Корректное значение процессора для компьютера HP.
+        /// РљРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїСЂРѕС†РµСЃСЃРѕСЂР° РґР»СЏ РєРѕРјРїСЊСЋС‚РµСЂР° HP.
         /// </summary>
         private string _correctDELLProcessor = "Intel Core i3-10100";
 
         /// <summary>
-        /// Корректное значение оперативной памяти для компьютера HP.
+        /// РљРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РѕРїРµСЂР°С‚РёРІРЅРѕР№ РїР°РјСЏС‚Рё РґР»СЏ РєРѕРјРїСЊСЋС‚РµСЂР° HP.
         /// </summary>
         private int _correctDELLRandomAccessMemoryCount = 4;
 
         /// <summary>
-        /// Корректное значение операционной системы для компьютера HP.
+        /// РљРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РѕРїРµСЂР°С†РёРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјС‹ РґР»СЏ РєРѕРјРїСЊСЋС‚РµСЂР° HP.
         /// </summary>
         private string _correctDELLOperationSystem = "Windows 10";
 
         /// <summary>
-        /// Модель.
+        /// РњРѕРґРµР»СЊ.
         /// </summary>
         private string _correctHPModel = "HP"; 
 
         /// <summary>
-        /// Процессор.
+        /// РџСЂРѕС†РµСЃСЃРѕСЂ.
         /// </summary>
         private string _correctHPProcessor = "Intel Core i5-7400"; 
 
         /// <summary>
-        /// Количество оперативной памяти.
+        /// РљРѕР»РёС‡РµСЃС‚РІРѕ РѕРїРµСЂР°С‚РёРІРЅРѕР№ РїР°РјСЏС‚Рё.
         /// </summary>
         private int _correctHPRandomAccessMemoryCount = 8;
 
         /// <summary>
-        /// Операционная система.
+        /// РћРїРµСЂР°С†РёРѕРЅРЅР°СЏ СЃРёСЃС‚РµРјР°.
         /// </summary>
         private string _correctHPOoperationSystem = "Windows 10 Pro"; 
         #endregion 
 
-        #region Методы.
+        #region РњРµС‚РѕРґС‹.
         /// <summary>
-        /// Проверка корректности создания разработчика компьютеров DELL.
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР° РєРѕРјРїСЊСЋС‚РµСЂРѕРІ DELL.
         /// </summary>
         [TestMethod]
         public void CreateDELLComputerDeveloper_ByConstructor_ShouldCreateDELLComputerDeveloper()
@@ -59,7 +59,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Проверка корректности создания разработчика компьютеров HP.
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР° РєРѕРјРїСЊСЋС‚РµСЂРѕРІ HP.
         /// </summary>
         [TestMethod]
         public void CreateHPComputerDeveloper_ByConstructor_ShouldCreateHPComputerDeveloper()
@@ -68,9 +68,9 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Создание директора с null-аргументом в конструкторе.
+        /// РЎРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂР° СЃ null-Р°СЂРіСѓРјРµРЅС‚РѕРј РІ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРµ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Разработчик компьютеров равен null!</exception>
+        /// <exception cref="ArgumentNullException">Р Р°Р·СЂР°Р±РѕС‚С‡РёРє РєРѕРјРїСЊСЋС‚РµСЂРѕРІ СЂР°РІРµРЅ null!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void CreateDirector_WithNullArgumentInConstructor_ShouldThrowArgumentNullException()
@@ -79,7 +79,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Создание директора с null-аргументом в конструкторе.
+        /// РЎРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂР° СЃ null-Р°СЂРіСѓРјРµРЅС‚РѕРј РІ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРµ.
         /// </summary>
         [TestMethod]
         public void CreateDirector_WithCorrectArgumentInConstructor_ShouldCreateDirector()
@@ -88,7 +88,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Проверка корректности создания компьютер DELL. 
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ РєРѕРјРїСЊСЋС‚РµСЂ DELL. 
         /// </summary>
         [TestMethod]
         public void CreateDELLFullComputer_WithCorrectArguments_ShouldReturnCorrectComputer()
@@ -100,7 +100,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Проверка корректности создания компьютер DELL без операционной системы. 
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ РєРѕРјРїСЊСЋС‚РµСЂ DELL Р±РµР· РѕРїРµСЂР°С†РёРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјС‹. 
         /// </summary>
         [TestMethod]
         public void CreateDELLComputerWithoutOperationSystem_WithCorrectArguments_ShouldReturnCorrectComputer()
@@ -112,7 +112,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Проверка корректности создания компьютера HP. 
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ РєРѕРјРїСЊСЋС‚РµСЂР° HP. 
         /// </summary>
         [TestMethod]
         public void CreateHPFullComputer_WithCorrectArguments_ShouldReturnCorrectComputer()
@@ -124,7 +124,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Проверка корректности создания компьютер HP без операционной системы. 
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ РєРѕРјРїСЊСЋС‚РµСЂ HP Р±РµР· РѕРїРµСЂР°С†РёРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјС‹. 
         /// </summary>
         [TestMethod]
         public void CreateHPComputerWithoutOperationSystem_WithCorrectArguments_ShouldReturnCorrectComputer()
@@ -134,7 +134,6 @@ namespace Patterns
             Assert.IsTrue(computer.Model == _correctHPModel && computer.Processor == _correctHPProcessor
                 && computer.RandomAccessMemory == _correctHPRandomAccessMemoryCount && computer.OperationSystem == null);
         }
-
         #endregion
     }
 }

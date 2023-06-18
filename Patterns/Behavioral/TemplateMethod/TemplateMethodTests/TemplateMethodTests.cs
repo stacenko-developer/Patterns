@@ -1,28 +1,28 @@
-namespace Patterns
+п»їnamespace Patterns
 {
     /// <summary>
-    /// Проверка корректности реализации паттерна TemplateMethod.
+    /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР°Р»РёР·Р°С†РёРё РїР°С‚С‚РµСЂРЅР° TemplateMethod.
     /// </summary>
     [TestClass]
     public class TemplateMethodTests
     {
-        #region Поля.
+        #region РџРѕР»СЏ.
         /// <summary>
-        /// Сотрудник по умолчанию.
+        /// РЎРѕС‚СЂСѓРґРЅРёРє РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.
         /// </summary>
         private Worker _defaultWorker = new Worker
         {
-            FirstName = "Артем",
-            LastName = "Стаценко",
-            Patronymic = "Николаевич",
-            Post = "Программист",
+            FirstName = "РђСЂС‚РµРј",
+            LastName = "РЎС‚Р°С†РµРЅРєРѕ",
+            Patronymic = "РќРёРєРѕР»Р°РµРІРёС‡",
+            Post = "РџСЂРѕРіСЂР°РјРјРёСЃС‚",
             IsSalaryPaid = false
         };
         #endregion
 
-        #region Методы.
+        #region РњРµС‚РѕРґС‹.
         /// <summary>
-        /// Проверка корректности создания бухгалтерии Сбера.
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР°.
         /// </summary>
         [TestMethod]
         public void CreateSberAccounting_WithoutParametersInConstructor_ShouldCreateSberAccounting()
@@ -31,18 +31,18 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Добавление сотрудника в базу бухгалтерии Сбера с null-аргументами.
+        /// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РІ Р±Р°Р·Сѓ Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° СЃ null-Р°СЂРіСѓРјРµРЅС‚Р°РјРё.
         /// </summary>
-        /// <param name="firstName">Имя.</param>
-        /// <param name="lastName">Фамилия.</param>
-        /// <param name="patronymic">Отчество.</param>
-        /// <param name="post">Должность.</param>
-        /// <exception cref="ArgumentNullException">Поля сотрудника равны null!</exception>
+        /// <param name="firstName">РРјСЏ.</param>
+        /// <param name="lastName">Р¤Р°РјРёР»РёСЏ.</param>
+        /// <param name="patronymic">РћС‚С‡РµСЃС‚РІРѕ.</param>
+        /// <param name="post">Р”РѕР»Р¶РЅРѕСЃС‚СЊ.</param>
+        /// <exception cref="ArgumentNullException">РџРѕР»СЏ СЃРѕС‚СЂСѓРґРЅРёРєР° СЂР°РІРЅС‹ null!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
-        [DataRow(null, "Стаценко", "Николаевич", "Программист")]
-        [DataRow("Артем", null, "Николаевич", "Программист")]
-        [DataRow("Артем", "Стаценко", null, "Программист")]
-        [DataRow("Артем", "Стаценко", "Николаевич", null)]
+        [DataRow(null, "РЎС‚Р°С†РµРЅРєРѕ", "РќРёРєРѕР»Р°РµРІРёС‡", "РџСЂРѕРіСЂР°РјРјРёСЃС‚")]
+        [DataRow("РђСЂС‚РµРј", null, "РќРёРєРѕР»Р°РµРІРёС‡", "РџСЂРѕРіСЂР°РјРјРёСЃС‚")]
+        [DataRow("РђСЂС‚РµРј", "РЎС‚Р°С†РµРЅРєРѕ", null, "РџСЂРѕРіСЂР°РјРјРёСЃС‚")]
+        [DataRow("РђСЂС‚РµРј", "РЎС‚Р°С†РµРЅРєРѕ", "РќРёРєРѕР»Р°РµРІРёС‡", null)]
         [TestMethod]
         public void AddWorkerInSberAccounting_WithNullArguments_ShouldThrowArgumentNullException(string firstName, string lastName, string patronymic,
             string post)
@@ -51,19 +51,19 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Добавление сотрудника в бухгалтерию Сбера с несуществующей должностью.
+        /// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РІ Р±СѓС…РіР°Р»С‚РµСЂРёСЋ РЎР±РµСЂР° СЃ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµР№ РґРѕР»Р¶РЅРѕСЃС‚СЊСЋ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Указанная должность в бухгалтерии не найдена!</exception>
+        /// <exception cref="ArgumentNullException">РЈРєР°Р·Р°РЅРЅР°СЏ РґРѕР»Р¶РЅРѕСЃС‚СЊ РІ Р±СѓС…РіР°Р»С‚РµСЂРёРё РЅРµ РЅР°Р№РґРµРЅР°!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void AddWorkerInSberAccounting_WithIncorrectPost_ShouldAddWorker() 
         {
             new SberAccounting().AddWorker(_defaultWorker.FirstName, _defaultWorker.LastName, _defaultWorker.Patronymic,
-                "Должность");
+                "Р”РѕР»Р¶РЅРѕСЃС‚СЊ");
         }
 
         /// <summary>
-        /// Добавление сотрудника в бухгалтерию Сбера с корректными параметрами.
+        /// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РІ Р±СѓС…РіР°Р»С‚РµСЂРёСЋ РЎР±РµСЂР° СЃ РєРѕСЂСЂРµРєС‚РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё.
         /// </summary>
         [TestMethod]
         public void AddWorkerInSberAccounting_WithCorrectArguments_ShouldAddWorker() 
@@ -73,9 +73,9 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Получение сотрудника из бухгалтерии Сбера по несуществующему идентификатору.
+        /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° РїРѕ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не найден!</exception>
+        /// <exception cref="ArgumentNullException">РЎРѕС‚СЂСѓРґРЅРёРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј РЅРµ РЅР°Р№РґРµРЅ!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void GetWorkerFromSberAccounting_WithNotExistenceId_ShouldThrowArgumentNullException()
@@ -84,7 +84,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Получение сотрудника из бухгалтерии Сбера по существующему идентификатору.
+        /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° РїРѕ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
         [TestMethod]
         public void GetWorkerFromSberAccounting_WithExistenceId_ShouldReturnWorker()
@@ -99,9 +99,9 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Удаление сотрудника из бухгалтерии Сбера по несуществующему идентификатору.
+        /// РЈРґР°Р»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° РїРѕ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не найден!</exception>
+        /// <exception cref="ArgumentNullException">РЎРѕС‚СЂСѓРґРЅРёРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј РЅРµ РЅР°Р№РґРµРЅ!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void DeleteWorkerFromSberAccounting_WithNotExistenceId_ShouldThrowArgumentNullException()
@@ -110,7 +110,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Удаление сотрудника из бухгалтерии Сбера по существующему идентификатору.
+        /// РЈРґР°Р»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° РїРѕ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
         [TestMethod]
         public void DeleteWorkerFromSberAccounting_WithExistenceId_ShouldDeleteWorker()
@@ -121,9 +121,9 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Выдача зарплаты сотруднику в бухгалтерии Сбера с несуществующим идентификатором.
+        /// Р’С‹РґР°С‡Р° Р·Р°СЂРїР»Р°С‚С‹ СЃРѕС‚СЂСѓРґРЅРёРєСѓ РІ Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° СЃ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не существует.</exception>
+        /// <exception cref="ArgumentNullException">РЎРѕС‚СЂСѓРґРЅРёРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void GetSalaryFromSberAccounting_WithNotExistenceId_ShouldThrowArgumentNullException()
@@ -132,7 +132,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Выдача зарплаты сотруднику в бухгалтерии Сбера с существующим идентификатором.
+        /// Р’С‹РґР°С‡Р° Р·Р°СЂРїР»Р°С‚С‹ СЃРѕС‚СЂСѓРґРЅРёРєСѓ РІ Р±СѓС…РіР°Р»С‚РµСЂРёРё РЎР±РµСЂР° СЃ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј.
         /// </summary>
         [TestMethod]
         public void GetSalaryFromSberAccounting_WithExistenceId_ShouldGetSalary()
@@ -147,7 +147,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Проверка корректности создания бухгалтерии Озона.
+        /// РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР°.
         /// </summary>
         [TestMethod]
         public void CreateOzonAccounting_WithoutParametersInConstructor_ShouldCreateOzonAccounting()
@@ -156,18 +156,18 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Добавление сотрудника в базу бухгалтерии Озона с null-аргументами.
+        /// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РІ Р±Р°Р·Сѓ Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° СЃ null-Р°СЂРіСѓРјРµРЅС‚Р°РјРё.
         /// </summary>
-        /// <param name="firstName">Имя.</param>
-        /// <param name="lastName">Фамилия.</param>
-        /// <param name="patronymic">Отчество.</param>
-        /// <param name="post">Должность.</param>
-        /// <exception cref="ArgumentNullException">Поля сотрудника равны null!</exception>
+        /// <param name="firstName">РРјСЏ.</param>
+        /// <param name="lastName">Р¤Р°РјРёР»РёСЏ.</param>
+        /// <param name="patronymic">РћС‚С‡РµСЃС‚РІРѕ.</param>
+        /// <param name="post">Р”РѕР»Р¶РЅРѕСЃС‚СЊ.</param>
+        /// <exception cref="ArgumentNullException">РџРѕР»СЏ СЃРѕС‚СЂСѓРґРЅРёРєР° СЂР°РІРЅС‹ null!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
-        [DataRow(null, "Стаценко", "Николаевич", "Программист")]
-        [DataRow("Артем", null, "Николаевич", "Программист")]
-        [DataRow("Артем", "Стаценко", null, "Программист")]
-        [DataRow("Артем", "Стаценко", "Николаевич", null)]
+        [DataRow(null, "РЎС‚Р°С†РµРЅРєРѕ", "РќРёРєРѕР»Р°РµРІРёС‡", "РџСЂРѕРіСЂР°РјРјРёСЃС‚")]
+        [DataRow("РђСЂС‚РµРј", null, "РќРёРєРѕР»Р°РµРІРёС‡", "РџСЂРѕРіСЂР°РјРјРёСЃС‚")]
+        [DataRow("РђСЂС‚РµРј", "РЎС‚Р°С†РµРЅРєРѕ", null, "РџСЂРѕРіСЂР°РјРјРёСЃС‚")]
+        [DataRow("РђСЂС‚РµРј", "РЎС‚Р°С†РµРЅРєРѕ", "РќРёРєРѕР»Р°РµРІРёС‡", null)]
         [TestMethod]
         public void AddWorkerInOzonAccounting_WithNullArguments_ShouldThrowArgumentNullException(string firstName, string lastName, string patronymic,
             string post)
@@ -176,7 +176,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Добавление сотрудника в бухгалтерию Озона с корректными параметрами.
+        /// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РІ Р±СѓС…РіР°Р»С‚РµСЂРёСЋ РћР·РѕРЅР° СЃ РєРѕСЂСЂРµРєС‚РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё.
         /// </summary>
         [TestMethod]
         public void AddWorkerInOzonAccounting_WithCorrectArguments_ShouldAddWorker() 
@@ -186,21 +186,21 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Добавление сотрудника в бухгалтерию Озона с несуществующей должностью.
+        /// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РІ Р±СѓС…РіР°Р»С‚РµСЂРёСЋ РћР·РѕРЅР° СЃ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµР№ РґРѕР»Р¶РЅРѕСЃС‚СЊСЋ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Указанная должность в бухгалтерии не найдена!</exception>
+        /// <exception cref="ArgumentNullException">РЈРєР°Р·Р°РЅРЅР°СЏ РґРѕР»Р¶РЅРѕСЃС‚СЊ РІ Р±СѓС…РіР°Р»С‚РµСЂРёРё РЅРµ РЅР°Р№РґРµРЅР°!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void AddWorkerInOzonAccounting_WithIncorrectPost_ShouldAddWorker()
         {
             new OzonAccounting().AddWorker(_defaultWorker.FirstName, _defaultWorker.LastName, _defaultWorker.Patronymic,
-                "Должность");
+                "Р”РѕР»Р¶РЅРѕСЃС‚СЊ");
         }
 
         /// <summary>
-        /// Получение сотрудника из бухгалтерии Озона по несуществующему идентификатору.
+        /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° РїРѕ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не найден!</exception>
+        /// <exception cref="ArgumentNullException">РЎРѕС‚СЂСѓРґРЅРёРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј РЅРµ РЅР°Р№РґРµРЅ!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void GetWorkerFromOzonAccounting_WithNotExistenceId_ShouldThrowArgumentNullException()
@@ -209,7 +209,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Получение сотрудника из бухгалтерии Озона по существующему идентификатору.
+        /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° РїРѕ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
         [TestMethod]
         public void GetWorkerFromOzonAccounting_WithExistenceId_ShouldReturnWorker() 
@@ -224,9 +224,9 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Удаление сотрудника из бухгалтерии Озона по несуществующему идентификатору.
+        /// РЈРґР°Р»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° РїРѕ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не найден!</exception>
+        /// <exception cref="ArgumentNullException">РЎРѕС‚СЂСѓРґРЅРёРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј РЅРµ РЅР°Р№РґРµРЅ!</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void DeleteWorkerFromOzonAccounting_WithNotExistenceId_ShouldThrowArgumentNullException()
@@ -235,7 +235,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Удаление сотрудника из бухгалтерии Озона по существующему идентификатору.
+        /// РЈРґР°Р»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР° РёР· Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° РїРѕ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ.
         /// </summary>
         [TestMethod]
         public void DeleteWorkerFromOzonAccounting_WithExistenceId_ShouldDeleteWorker()
@@ -246,9 +246,9 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Выдача зарплаты сотруднику в бухгалтерии Озона с несуществующим идентификатором. 
+        /// Р’С‹РґР°С‡Р° Р·Р°СЂРїР»Р°С‚С‹ СЃРѕС‚СЂСѓРґРЅРёРєСѓ РІ Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° СЃ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј. 
         /// </summary>
-        /// <exception cref="ArgumentNullException">Сотрудник с указанным идентификатором не существует.</exception>
+        /// <exception cref="ArgumentNullException">РЎРѕС‚СЂСѓРґРЅРёРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.</exception>
         [ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void GetSalaryFromOzonAccounting_WithNotExistenceId_ShouldThrowArgumentNullException() 
@@ -257,7 +257,7 @@ namespace Patterns
         }
 
         /// <summary>
-        /// Выдача зарплаты сотруднику в бухгалтерии Озона с существующим идентификатором.
+        /// Р’С‹РґР°С‡Р° Р·Р°СЂРїР»Р°С‚С‹ СЃРѕС‚СЂСѓРґРЅРёРєСѓ РІ Р±СѓС…РіР°Р»С‚РµСЂРёРё РћР·РѕРЅР° СЃ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј.
         /// </summary>
         [TestMethod]
         public void GetSalaryOzonSberAccounting_WithExistenceId_ShouldGetSalary()
