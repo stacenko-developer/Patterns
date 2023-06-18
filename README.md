@@ -405,7 +405,59 @@ public class HPComputerDeveloper : IComputerDeveloper
         /// <returns>Компьютер.</returns>
         public Computer GetComputer() => _computer;
 }
+```
 :four: Теперь создадим класс Director, который будет иметь поле IComputerDeveloper, то есть, он будет принимать в конструкторе одного из разработчиков компьютеров и в зависимости от разработчика создавать определенный компьютер.
+```C#
+/// <summary>
+/// Директор.
+/// </summary>
+public class Director
+{
+        /// <summary>
+        /// Разработчик компьютеров.
+        /// </summary>
+        private IComputerDeveloper _computerDeveloper;
+
+        /// <summary>
+        /// Создание директора с помощью указанных параметров.
+        /// </summary>
+        /// <param name="computerDeveloper">Разработчик компьютеров.</param>
+        /// <exception cref="ArgumentNullException">Разработчик компьютеров равен null!</exception>
+        public Director(IComputerDeveloper computerDeveloper) 
+        {
+            if (computerDeveloper == null)
+            {
+                throw new ArgumentNullException(nameof(computerDeveloper), "Разработчик компьютеров равен null!");
+            }
+
+            _computerDeveloper = computerDeveloper;
+        }
+
+        /// <summary>
+        /// Создание полноценного компьютера.
+        /// </summary>
+        /// <returns>Созданный компьютер.</returns>
+        public Computer CreateFullComputer()
+        {
+            _computerDeveloper.SetProcessor();
+            _computerDeveloper.SetRandomAccessMemory();
+            _computerDeveloper.SetOperationSystem();
+
+            return _computerDeveloper.GetComputer();
+        }
+
+        /// <summary>
+        /// Создание компьютера без операционной системы.
+        /// </summary>
+        /// <returns>Созданный компьютер.</returns>
+        public Computer CreateComputerWithoutOperationSystem()
+        {
+            _computerDeveloper.SetProcessor();
+            _computerDeveloper.SetRandomAccessMemory();
+
+            return _computerDeveloper.GetComputer();
+        }
+}
 ```
 ## Структурные паттерны
 __Структурные паттерны__ (Structural) - цель их применения заключается в том, что благодаря им вы можете совмещать и сочетать сущности вместе.
