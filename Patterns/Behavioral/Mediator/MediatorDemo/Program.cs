@@ -20,14 +20,14 @@ namespace Patterns
 			var tasksCount = 10;
 			var firstTaskText = "Вступительное задание";
 
-			for (int index = 1; index <= tasksCount; index++)
+			for (var index = 1; index <= tasksCount; index++)
 			{
 				tfs.AddTask($"Текст задачи {index}");
 			}
 
 			teamLead.GiveTask(firstTaskText);
 
-			for (int index = 1; index <= tasksCount; index++)
+			for (var index = 1; index <= tasksCount; index++)
 			{
 				programmer.FinishWork();
 			}
