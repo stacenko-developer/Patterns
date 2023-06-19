@@ -41,7 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NokiaDeveloper.cs" />
+    <Compile Include="Samsung.cs" />
+    <Compile Include="IPhoneDeveloper.cs" />
+    <Compile Include="Nokia.cs" />
+    <Compile Include="Phone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SamsungDeveloper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
