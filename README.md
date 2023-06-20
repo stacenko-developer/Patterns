@@ -582,9 +582,78 @@ public class Customer : User
 ___
 ### Фабричный метод
 __Фабричный метод (Factory Method)__ - это порождающий паттерн проектирования, который определяет интерфейс для создания объектов определенного класса, но именно в подклассах принимается решение о типе объекта, который будет создан.<br>
-> :white_check_mark: Фабричный метод будет полезен, если мы заранее не знаем, какие типы объектов мы хотим создать.
+> :white_check_mark: Фабричный метод будет полезен, если мы заранее не знаем, объекты каких типов мы хотим создать.
 
+:one: Реализуем паттерн на примере создания телефонов. Пусть у нас будет базовый класс __Phone__, содержащий следующие свойства: 
+```C#
+/// <summary>
+/// Телефон.
+/// </summary>
+public abstract class Phone
+{
+        /// <summary>
+        /// Цена.
+        /// </summary>
+        public decimal Price { get; set; }
 
+        /// <summary>
+        /// Модель.
+        /// </summary>
+        public string Model { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Процессор.
+        /// </summary>
+        public string Processor { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Оперативная память.
+        /// </summary>
+        public int RandomAccessMemory { get; set; }
+
+        /// <summary>
+        /// Строковое представления объекта телефона.
+        /// </summary>
+        /// <returns>Данные телефона в виде строки.</returns>
+        public override string ToString() => $"Цена = {Price} Модель = {Model} Процессор = {Processor} Оперативная память = {RandomAccessMemory}";
+}
+```
+:two: Создадим два класса наследника: Nokia и Samsung, в них добавим по одному дополнительному свойству.
+```C#
+/// <summary>
+/// Нокиа.
+/// </summary>
+public class Nokia : Phone
+{
+        /// <summary>
+        /// Работает ли батарея.
+        /// </summary>
+        public bool IsBatteryWork { get; set; }
+
+        /// <summary>
+        /// Строковое представления объекта Нокиа.
+        /// </summary>
+        /// <returns>Данные Нокиа в виде строки.</returns>
+        public override string ToString() => $"Нокиа: {base.ToString()} Работает ли батарея = {IsBatteryWork}";
+}
+
+/// <summary>
+/// Самсунг.
+/// </summary>
+public class Samsung : Phone
+{
+        /// <summary>
+        /// Влючена ли сейчас фронтальная камера.
+        /// </summary>
+        public bool IsFrontCamera { get; set; }
+
+        /// <summary>
+        /// Строковое представления объекта Самсунга.
+        /// </summary>
+        /// <returns>Данные Самсунга в виде строки.</returns>
+        public override string ToString() => $"Самсунг: {base.ToString()} Включена ли фронтальная камера = {IsFrontCamera}";
+}
+```
 ## Структурные паттерны
 __Структурные паттерны__ (Structural) - цель их применения заключается в том, что благодаря им вы можете совмещать и сочетать сущности вместе.
 ___
