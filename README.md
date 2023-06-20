@@ -660,7 +660,48 @@ public class Samsung : Phone
         public override string ToString() => $"Самсунг: {base.ToString()} Включена ли фронтальная камера = {IsFrontCamera}";
 }
 ```
-:three: 
+:three: Создадим интерфейс создателя телефонов IPhoneDeveloper:
+```C#
+/// <summary>
+/// Содержит методы для рабработчика телефонов.
+/// </summary>
+public interface IPhoneDeveloper
+{   
+        /// <summary>
+        /// Создание телефона.
+        /// </summary>
+        /// <returns>Телефон.</returns>
+        Phone CreatePhone();
+}
+```
+:four: Создадим разработчиков телефонов Нокиа и Самсунга, реализующих интерфейсы __IPhoneDeveloper__:
+```C#
+/// <summary>
+/// Разработчик телефонов фирмы Нокиа.
+/// </summary>
+public class NokiaDeveloper : IPhoneDeveloper
+{
+        /// <summary>
+        /// Создание телефона.
+        /// </summary>
+        /// <returns>Телефон.</returns>
+        public Phone CreatePhone() => new Nokia();
+}
+
+/// <summary>
+/// Разработчик телефонов фирмы Самсунг.
+/// </summary>
+public class SamsungDeveloper
+{
+        /// <summary>
+        /// Создание телефона.
+        /// </summary>
+        /// <returns>Телефон.</returns>
+        public Phone CreatePhone() => new Samsung();
+}
+```
+:white_check_mark: __Преимущества паттерна Factory Method__: клонирование объектов без привязки к конкретным классам, сокращение кода инициализации экземплятор классов<br>
+:x: __Недостатки__: Проблемы с клонированием составных объектов, то есть, тех объектов, которые внутри содержат другие объекты.
 ## Структурные паттерны
 __Структурные паттерны__ (Structural) - цель их применения заключается в том, что благодаря им вы можете совмещать и сочетать сущности вместе.
 ___
