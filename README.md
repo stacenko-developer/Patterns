@@ -920,7 +920,143 @@ public class AgeWorkersFilter : AdditionalFilteringCondition
 :x: __Недостатки__: в результате получается большое число мелких объектов, которые друг на друга похожи и отличаются способом взаимосвязи.
 ___
 ### Компоновщик 
-__Компоновщик (Composite)__ - 
+__Компоновщик (Composite)__ - это структурный паттерн проектирования, который используется, когда объекты должны быть реализованы в виде древовидной структуры и когда клиенты аналогично управляют как целыми объектами, так и составными частями.<br>
+> :white_check_mark: Реализуем данный паттерн на примере файловой системы.
+
+:one: Создадим абстрактный класс компонента файловой системы, единственное поле у которого будет название компонента. Мы также можем добавлять в компонент другие компоненты и аналогично удалять их.<br>
+```C#
+/// <summary>
+/// Компонент файловой системы.
+/// </summary>
+public abstract class FileSystemComponent
+{
+        /// <summary>
+        /// Название.
+        /// </summary>
+        protected string _name;
+
+        /// <summary>
+        /// Создание компонента файловой системы с помощью указанных параметров.
+        /// </summary>
+        /// <param name="name">Название компонента файловой системы.</param>
+        public FileSystemComponent(string name)
+        {   
+            Validator.ValidateStringText(name);
+            
+            _name = name;
+        }
+
+        /// <summary>
+        /// Проверка корректности компонента.
+        /// </summary>
+        /// <param name="component">Компонент, который необходимо проверить.</param>
+        /// <exception cref="ArgumentNullException">Компонент равен null!</exception>
+        protected void ValidateComponent(FileSystemComponent component)
+        {
+            if (component == null)
+            {
+                throw new ArgumentNullException(nameof(component), "Компонент равен null!");
+            }
+        }
+
+        /// <summary>
+        /// Добавление компонента.
+        /// </summary>
+        /// <param name="component">Компонент, который необходимо добавить.</param>
+        public virtual void Add(FileSystemComponent component) 
+        {   
+            ValidateComponent(component);
+        }
+
+        /// <summary>
+        /// Добавление компонента.
+        /// </summary>
+        /// <param name="component">Компонент, который необходимо добавить.</param>
+        public virtual void Remove(FileSystemComponent component) 
+        {
+            ValidateComponent(component);
+        }
+
+        /// <summary>
+        /// Строковое преставление объекта компонента файловой системы.
+        /// </summary>
+        /// <returns>Данные объекта компонента файловой системы в виде строки.</returns>
+        public override string ToString() => _name;
+}
+```
+:two: Создадим первый класс-наследник компонента файловой системы: файл. У файла не будут переопределены методы добавления и удаления - базовая реализация нас вполне устраивает, поскольку мы не может добавлять в файл другие файлы.
+```C#
+/// <summary>
+/// Файл.
+/// </summary>
+public class File : FileSystemComponent
+{
+        /// <summary>
+        /// Создание файла с помощью указанных параметров.
+        /// </summary>
+        /// <param name="name">Название файла.</param>
+        public File(string name) 
+            : base(name)
+        {
+        }
+}
+```
+:three: Добавим второй класс-наследник компонента файловой системы: папка. У папки будет список компонентов файловой системы, поскольку в папку мы уже можем добавить как другие файлы, так и другие папки. Также будут переопределены методы добавления и удаления компонентов файловой системы из директории.
+```C#
+/// <summary>
+/// Папка.
+/// </summary>
+public class Directory : FileSystemComponent
+{
+        /// <summary>
+        /// Список компонентов файловой системы, которые находятся в папке.
+        /// </summary>
+        private List<FileSystemComponent> _components = new List<FileSystemComponent>(); 
+
+        /// <summary>
+        /// Создает папку с помощью указанных параметров.
+        /// </summary>
+        /// <param name="name">Название папки.</param>
+        public Directory(string name) 
+            : base(name)
+        {
+        }
+
+        /// <summary>
+        /// Добавление компонента.
+        /// </summary>
+        /// <param name="component">Компонент, который необходимо добавить.</param>
+        public override void Add(FileSystemComponent component)
+        {
+            ValidateComponent(component);
+
+            _components.Add(component);
+        }
+
+        /// <summary>
+        /// Добавление компонента.
+        /// </summary>
+        /// <param name="component">Компонент, который необходимо добавить.</param>
+        /// <exception cref="ArgumentNullException">Указанный компонент файловой системы отсутствует в директории!</exception>
+        public override void Remove(FileSystemComponent component)
+        {
+            ValidateComponent(component);
+
+            if (!_components.Contains(component))
+            {
+                throw new ArgumentNullException("Указанный компонент файловой системы отсутствует в директории!");
+            }
+
+            _components.Remove(component);
+        }
+
+        /// <summary>
+        /// Строковое преставление объекта компонента файловой системы.
+        /// </summary>
+        /// <returns>Данные объекта компонента файловой системы в виде строки.</returns>
+        public override string ToString() => $"{_name}: {string.Join("=>", _components)}{Environment.NewLine}";
+}
+```
 ## Поведенческие паттерны
 __Поведенческие паттерны__ (Behavioral) описывают способы реализации взаимодействия между объектами с отличающимися типами. При таком взаимодействии объекты могут решать более трудные задачи, чем если бы они решали их по-отдельности.
 ___
